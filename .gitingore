@@ -1,0 +1,61 @@
+# --- Sensibili / ambiente ---
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# --- Composer ---
+/vendor/
+composer.phar
+
+# --- Cache, log, runtime ---
+/cache/
+/logs/
+/tmp/
+/temp/
+/runtime/
+/sessions/
+/twig_cache/
+/var/cache/
+/var/log/
+/app/cache/
+/app/logs/
+/app/tmp/
+.phinx.log
+*.log
+
+# --- Test / Coverage ---
+.phpunit.result.cache
+/coverage/
+/build/logs/
+
+# --- Editor / IDE ---
+/.idea/
+/.vscode/
+/*.code-workspace
+*.sublime-*
+*.swp
+*~
+*.orig
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+
+# --- Node (se presente) ---
+/node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# --- Asset build opzionali ---
+/public/assets/dist/
+/public/assets/.cache/
+
+# --- SQL dumps locali (non le migrazioni Phinx) ---
+*.sql
+!db/migrations/**
+
+# --- File di deploy locali (opzionali) ---
+/.ftpconfig
