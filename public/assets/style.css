@@ -1060,3 +1060,474 @@ body.no-header main.container { padding-top: 0 !important; }
   box-shadow:0 6px 18px rgba(11,16,32,.18);
   user-select:none; -webkit-user-select:none;
 }
+/* ===================== DAY CORE (solo .day-page) ===================== */
+/* Obiettivi:
+   - Hero full-bleed (tutta la larghezza)
+   - Prev/Indice/Next in orizzontale
+   - Immagini delle card: stessa altezza, centratura verticale, no overflow
+   - Occhiello sopra, titolo leggibile (una riga con ellissi)
+   - Niente “linea verticale” di sfondo
+*/
+
+/* 0) sicurezza e rimozione linea verticale */
+.day-page,
+.day-page .day-hero { overflow-x: hidden; }
+.day-page .story::before { content: none; } /* se esiste nel tema, disattiva la linea */
+
+/* 1) HERO full-bleed */
+.day-page .day-hero{
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  min-height: clamp(260px, 34vh, 520px);
+  overflow: hidden;
+  border-bottom: 1px solid var(--edge);
+}
+@supports (width: 100dvw){
+  .day-page .day-hero{
+    width: 100dvw;
+    margin-left: calc(50% - 50dvw);
+    margin-right: calc(50% - 50dvw);
+  }
+}
+.day-page .day-hero > img{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* 2) Toolbar (in alto) in orizzontale */
+.day-page .toolbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-top: .4rem;
+}
+.day-page .toolbar .left,
+.day-page .toolbar .center,
+.day-page .toolbar .right{
+  display: flex;
+  align-items: center;
+}
+.day-page .toolbar .left  { justify-content: flex-start;  flex: 1 1 0; }
+.day-page .toolbar .center{ justify-content: center;      flex: 0 0 auto; }
+.day-page .toolbar .right { justify-content: flex-end;    flex: 1 1 0; }
+
+/* 3) Card sezioni — griglia alternata (mobile: verticale; desktop: dx/sx) */
+.day-page .panel{
+  display: grid;
+  grid-template-areas:
+    "media"
+    "body";
+  gap: 0;
+  border-radius: var(--radius, 12px);
+  border: 1px solid var(--edge);
+  background: #fff;
+  box-shadow: var(--shadow-s, 0 1px 3px rgba(0,0,0,.06));
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+@media (min-width: 900px){
+  .day-page .panel    { grid-template-columns: 48% 52%; grid-template-areas: "media body"; }
+  .day-page .panel.alt{ grid-template-columns: 52% 48%; grid-template-areas: "body media"; }
+}
+
+/* 4) Immagini uniformi dentro le card */
+:root{
+  --day-media-h-m: 220px;  /* altezza immagine mobile */
+  --day-media-h-d: 360px;  /* altezza immagine desktop */
+  --day-frame-pad: 10px;   /* cornice interna */
+  --day-frame-radius: 14px;
+}
+.day-page .panel-media{
+  grid-area: media;
+  position: relative;
+  height: var(--day-media-h-m);
+  overflow: hidden;
+  background: transparent;
+}
+@media (min-width: 900px){
+  .day-page .panel-media{ height: var(--day-media-h-d); }
+}
+.day-page .panel-media > img{
+  position: absolute;
+  inset: var(--day-frame-pad);                       /* cornice */
+  width: calc(100% - 2 * var(--day-frame-pad));
+  height: calc(100% - 2 * var(--day-frame-pad));
+  object-fit: cover;
+  object-position: 50% 50%;                          /* centrata anche verticalmente */
+  border-radius: var(--day-frame-radius);
+  display: block;
+}
+.day-page .panel-media::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: calc(var(--day-frame-radius) + var(--day-frame-pad));
+  border: 1px solid rgba(2,6,23,.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.5);
+  pointer-events:none;
+}
+
+/* 5) Testo card */
+.day-page .panel-body{ grid-area: body; padding: 14px; }
+.day-page .panel-head{
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;         /* titolo a sx, contatori a dx */
+  align-items: end;
+  gap: 8px 12px;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--edge);
+  background: transparent;
+}
+/* Occhiello sopra */
+.day-page .panel-head .eyebrow{
+  grid-column: 1 / -1;
+  order: -1;
+  margin: 0 0 6px 0;
+  font-size: .86rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #1d4ed8;
+}
+/* Titolo (una riga, ellissi) */
+.day-page .panel-head .h3{
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  padding: .12rem .5rem;
+  border-radius: 10px;
+  background: var(--paper-2);
+  box-shadow: 0 1px 0 rgba(0,0,0,.04) inset;
+  font-size: clamp(18px, 1.2vw + 14px, 26px);
+  line-height: 1.2;
+}
+.day-page .panel-head .counters{
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* 6) Prev/Next in fondo (orizzontale, spaziati) */
+.day-page .btn-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-top: 1.2rem;
+}
+/* ====== GIORNO – FIX MINIMI E MIRATI ====== */
+
+/* 1) HERO: davvero full-bleed anche se è dentro un container */
+.day-page .day-hero,
+.day-page .hero.fullbleed{
+  position: relative;
+  /* tecnica doppia per coprire TUTTA la finestra su tutti i browser */
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  transform: none;
+  max-width: none;
+  min-height: clamp(260px, 34vh, 520px);
+  overflow: hidden;
+  border-bottom: 1px solid var(--edge);
+}
+@supports (width: 100dvw){
+  .day-page .day-hero,
+  .day-page .hero.fullbleed{
+    width: 100dvw;
+    margin-left: -50dvw;
+    margin-right: -50dvw;
+  }
+}
+.day-page .day-hero > img,
+.day-page .hero.fullbleed > img{
+  display:block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* 2) Toolbar: layout orizzontale ma stile più sobrio (come prima) */
+.day-page .toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+}
+.day-page .toolbar .btn{
+  font-size: .95rem;
+  padding: .45rem .8rem;
+  border-radius: 8px;
+  line-height: 1.1;
+}
+.day-page .toolbar .btn.subtle{
+  background: var(--paper-2);
+  border: 1px solid var(--edge);
+}
+.day-page .toolbar .btn.index{
+  background: #111827;
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 700;
+  padding: .5rem .9rem;
+}
+
+/* 3) Immagini card: stessa altezza E centrate verticalmente (no sovrapposizioni) */
+:root{
+  --day-media-h-m: 220px;
+  --day-media-h-d: 360px;
+  --day-frame-pad: 10px;
+  --day-frame-radius: 14px;
+}
+.day-page .panel-media{
+  /* invece di position:absolute sull’immagine, usiamo un GRID che centra */
+  display: grid;
+  place-items: center;          /* centra anche in verticale */
+  height: var(--day-media-h-m);
+  padding: var(--day-frame-pad);/* “cornice” trasparente */
+  background: transparent;
+  border-radius: calc(var(--day-frame-radius) + var(--day-frame-pad));
+  box-shadow: inset 0 0 0 1px rgba(2,6,23,.12), inset 0 0 0 2px rgba(255,255,255,.35);
+  overflow: hidden;
+}
+@media (min-width: 900px){
+  .day-page .panel-media{ height: var(--day-media-h-d); }
+}
+.day-page .panel-media > img{
+  /* riempi il riquadro senza deformare, sempre centrato */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  border-radius: var(--day-frame-radius);
+  display: block;
+}
+/* ========== GIORNO — FIX MIRATI (hero full, bottoni distanziati, media centrate) ========== */
+
+/* 1) HERO davvero a tutta finestra (anche se annidato) */
+.day-page .day-hero,
+.day-page .hero.fullbleed{
+  position: relative;
+  width: 100vw;
+  left: 50%; margin-left: -50vw;
+  right: 50%; margin-right: -50vw;
+  max-width: none;
+  min-height: clamp(260px, 34vh, 520px);
+  overflow: hidden;
+  border-bottom: 1px solid var(--edge);
+}
+@supports (width: 100dvw){
+  .day-page .day-hero,
+  .day-page .hero.fullbleed{
+    width: 100dvw;
+    left: 50%; margin-left: -50dvw;
+    right: 50%; margin-right: -50dvw;
+  }
+}
+.day-page .day-hero > img,
+.day-page .hero.fullbleed > img{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block; object-fit: cover; object-position: center;
+}
+
+/* 2) Toolbar: stessi bottoni ma più spazio sotto */
+.day-page .toolbar{ margin-bottom: 1.25rem; }
+
+/* 3) CARD MEDIA: rimuovi cornice/padding precedenti e centra al 100% */
+.day-page .panel-media{ padding: 0 !important; box-shadow: none !important; border: 0 !important; }
+.day-page .panel-media::before{ content: none !important; }
+
+/* Altezza uniforme per tutte le immagini */
+:root{
+  --day-media-h-m: 220px;  /* mobile */
+  --day-media-h-d: 360px;  /* desktop */
+}
+.day-page .panel-media{
+  position: relative;
+  height: var(--day-media-h-m);
+  overflow: hidden;
+  background: transparent;
+}
+@media (min-width: 900px){
+  .day-page .panel-media{ height: var(--day-media-h-d); }
+}
+
+/* Su desktop, media e body hanno la STESSA altezza riga → media centrata verticalmente */
+@media (min-width: 900px){
+  .day-page .panel{
+    display: grid;
+    grid-te
+/* ===== GIORNO — FIX MINIMO E MIRATO ===== */
+
+/* 1) HERO full-bleed robusto (anche se annidato in container) */
+.day-page .day-hero,
+.day-page .hero.fullbleed{
+  position: relative;
+  display: block;
+  width: 100vw;
+  left: 50%; margin-left: -50vw;
+  right: 50%; margin-right: -50vw;
+  max-width: none;
+  min-height: clamp(260px, 34vh, 520px);
+  overflow: hidden;
+  border-bottom: 1px solid var(--edge);
+}
+@supports (width: 100dvw){
+  .day-page .day-hero,
+  .day-page .hero.fullbleed{
+    width: 100dvw;
+    margin-left: -50dvw;
+    margin-right: -50dvw;
+  }
+}
+.day-page .day-hero > img,
+.day-page .hero.fullbleed > img{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 50%;
+  display: block;
+}
+
+/* 2) Più spazio sotto i bottoni (prev/indice/next) */
+.day-page .toolbar{ margin-bottom: 1.5rem; }
+
+/* 3) CARD: media tutte uguali, centrate verticalmente, con margine interno uniforme */
+:root{
+  --day-media-h-m: 240px;   /* altezza immagine mobile */
+  --day-media-h-d: 420px;   /* altezza immagine desktop */
+  --day-media-pad: 10px;    /* distanza immagine-bordo card */
+  --day-media-radius: 12px; /* arrotondamento immagine */
+}
+
+.day-page .panel{ overflow: hidden; }
+
+/* contenitore media: grid per centrare, altezza fissa per uniformità */
+.day-page .panel-media{
+  display: grid;
+  place-items: center;                 /* centra anche in verticale */
+  height: var(--day-media-h-m);
+  padding: var(--day-media-pad);       /* distanza costante dal bordo card */
+  box-sizing: border-box;
+  background: transparent;
+  overflow: hidden;
+}
+@media (min-width: 900px){
+  .day-page .panel-media{ height: var(--day-media-h-d); }
+}
+
+/* immagine: riempi il riquadro, resta centrata, mai deformata */
+.day-page .panel-media > img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  border-radius: var(--day-media-radius);
+  display: block;
+}
+
+/* un filo di respiro tra hero e intestazione (se necessario) */
+.day-page .day-head{ margin-top: .75rem; }
+
+/* un filo di respiro prima della prima card */
+.day-page .story{ margin-top: 1rem; }
+/* ==================== GIORNO — FIX STRUTTURALI E PULITI ==================== */
+
+/* HERO: breakout full-bleed (identico comportamento della home) */
+.day-page .day-hero-breakout{
+  position: relative;
+  z-index: 0;
+  /* esci dalle colonne del layout e copri la finestra */
+  width: 100vw;
+  left: 50%;
+  margin-left: -50vw;
+  right: 50%;
+  margin-right: -50vw;
+  max-width: none;
+  min-height: clamp(260px, 34vh, 520px);
+  overflow: hidden;
+  border-bottom: 1px solid var(--edge);
+}
+@supports (width: 100dvw){
+  .day-page .day-hero-breakout{
+    width: 100dvw;
+    margin-left: -50dvw;
+    margin-right: -50dvw;
+  }
+}
+.day-page .day-hero-media{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+.day-page .day-hero-media > img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+.day-page .day-hero-veil{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* overlay leggero per migliorare la leggibilità dei titoli */
+  background:
+    radial-gradient(140% 120% at 50% 20%, rgba(2,6,23,0.00) 0%, rgba(2,6,23,0.12) 55%, rgba(2,6,23,0.22) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0.00) 35%, rgba(0,0,0,0.20) 100%);
+}
+
+/* SPAZIO tra toolbar e prima card (i bottoni ora ti vanno bene) */
+.day-page .toolbar{ margin-bottom: 1.25rem; }
+
+/* CARD MEDIA: altezza uniforme, centrata in verticale e con margine dal bordo */
+:root{
+  --day-media-h-m: 240px;   /* mobile */
+  --day-media-h-d: 420px;   /* desktop */
+  --day-media-pad: 12px;    /* distanza immagine-bordo card */
+  --day-media-radius: 12px; /* arrotondamento immagine */
+}
+
+/* contenitore media: usa un frame interno che gestisce margine e centratura */
+.day-page .panel-media{
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+.day-page .panel-media .media-frame{
+  display: grid;             /* centriamo anche verticalmente */
+  place-items: center;
+  height: var(--day-media-h-m);
+  padding: var(--day-media-pad);
+  box-sizing: border-box;
+}
+@media (min-width: 900px){
+  .day-page .panel-media .media-frame{ height: var(--day-media-h-d); }
+}
+.day-page .panel-media .media-frame > img{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;          /* riempi il frame senza deformare */
+  object-position: 50% 50%;   /* centratura perfetta */
+  border-radius: var(--day-media-radius);
+}
+
+/* Se qualche vecchia regola teneva l'immagine assoluta o con misure fisse, neutralizziamola qui */
+.day-page .panel-media > img{ position: static; width: auto; height: auto; } /* reset difensivo */

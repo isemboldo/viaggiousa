@@ -3,12 +3,14 @@
 
 {% block content %}
 <section class="day-page">
-
-  {# === HERO FULL-WIDTH (fuori dal container) ========================== #}
-  <div class="day-hero" aria-hidden="true">
+{# HERO FULL-BLEED — esce dal container con un wrapper “breakout” #}
+<div class="day-hero-breakout" aria-hidden="true">
+  <figure class="day-hero-media">
     <img src="{{ day.immagine_copertina ?: (base_url ~ '/assets/images/cover-default.jpg') }}" alt="">
-    <div class="veil"></div>
-  </div>
+  </figure>
+  <div class="day-hero-veil"></div>
+</div>
+
 
   <div class="container">
     {# Meta + Heading #}
@@ -42,10 +44,13 @@
         {% for s in sections %}
           <article class="panel{% if loop.index is odd %} alt{% endif %}">
   <div class="panel-media">
+  <div class="media-frame">
     {% if s.immagine %}
-      <img src="{{ s.immagine }}" alt="">
+      <img src="{{ asset_url(s.immagine) }}" alt="" loading="lazy" decoding="async">
     {% endif %}
   </div>
+</div>
+
 
   <div class="panel-body">
     <div class="panel-head">
