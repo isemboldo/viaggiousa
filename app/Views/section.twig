@@ -1,0 +1,33 @@
+{% extends "layout.twig" %}
+{% block title %}{{ section.titolo }}{% endblock %}
+{% block content %}
+
+  <nav aria-label="breadcrumb" class="section">
+    <a href="{{ base_url }}/giorno/{{ section.giorno_id }}">← Giorno {{ section.giorno_num|default(section.giorno_id) }}</a>
+  </nav>
+
+  <article class="section">
+    <h1>{{ section.titolo }}</h1>
+    {% if section.sovratitolo %}<p class="muted" style="margin-top:.15rem;">{{ section.sovratitolo }}</p>{% endif %}
+
+    {% if section.immagine %}
+      <div class="section" style="margin-top:.6rem;">
+        <div style="border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-m); border:1px solid var(--edge);">
+          <img src="{{ asset_url(section.immagine) }}" alt="" loading="lazy" decoding="async" width="1600" height="1066">
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section.testo %}
+      <div class="section">{{ section.testo|raw }}</div>
+    {% endif %}
+  </article>
+
+  {% if nav is defined and (nav.prev or nav.next) %}
+  <nav class="btn-row" aria-label="Navigazione sezioni">
+    <div>{% if nav.prev %}<a class="btn" href="{{ base_url }}/sezione/{{ nav.prev.id }}">← {{ nav.prev.titolo|default('Sezione precedente') }}</a>{% endif %}</div>
+    <div>{% if nav.next %}<a class="btn" href="{{ base_url }}/sezione/{{ nav.next.id }}">{{ nav.next.titolo|default('Sezione successiva') }} →</a>{% endif %}</div>
+  </nav>
+  {% endif %}
+
+{% endblock %}

@@ -1,0 +1,9 @@
+# viaggiousa/.htaccess
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /viaggiousa/
+
+  # Se esiste /public, riscrivi verso public/index.php
+  RewriteRule ^$ public/ [L]
+  RewriteRule (.*) public/$1 [L]
+</IfModule>

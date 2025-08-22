@@ -1,0 +1,74 @@
+{% extends "layout.twig" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+  {# HERO fullscreen che “avvolge” (full-bleed, centrata, due righe) #}
+  <section class="hero fullbleed home-hero centered" aria-label="Intro">
+    <img src="{{ hero.img }}" alt="" loading="eager" decoding="async" width="1920" height="1080">
+    <div class="hero-content">
+      <h1>La Nostra Avventura Americana 2026</h1>
+      <p>Il diario di un viaggio indimenticabile, dalle luci di New York al cuore del Sud, fino alla magia di Orlando.</p>
+    </div>
+  </section>
+
+  {# SEZIONE BOTTONI: titolo esplicativo + griglia di “bottoni” #}
+  <section class="home-sections">
+    <div class="intro">
+      <h2>Esplora il Viaggio</h2>
+      <p>Scegli una parte della nostra avventura per iniziare.</p>
+    </div>
+
+    <div class="home-grid">
+      {# Parti dal DB: solo titolo e bottone, foto protagonista #}
+      {% for p in tiles %}
+        <article class="btn-card">
+          <div class="top">
+            <img src="{{ p.img|default(hero.img) }}" alt="" loading="lazy" decoding="async" width="1200" height="800">
+            <div class="title">{{ p.etichetta|default(p.titolo) }}</div>
+          </div>
+          <div class="bottom">
+            <div class="desc">{{ p.descrizione_breve|default('') }}</div>
+            <div class="cta-row">
+              <a class="cta" href="{{ base_url }}/page/hub?sezione={{ p.slug }}">Esplora →</a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+
+      {# Extra statici: Mappa / Rendiconto / Link utili #}
+      <article class="btn-card">
+        <div class="top">
+          <img src="{{ hero.img }}" alt="" loading="lazy" decoding="async" width="1200" height="800">
+          <div class="title">Mappa</div>
+        </div>
+        <div class="bottom">
+          <div class="desc">L’itinerario completo su una mappa interattiva.</div>
+          <div class="cta-row"><a class="cta" href="{{ base_url }}/mappa">Esplora →</a></div>
+        </div>
+      </article>
+
+      <article class="btn-card">
+        <div class="top">
+          <img src="{{ hero.img }}" alt="" loading="lazy" decoding="async" width="1200" height="800">
+          <div class="title">Rendiconto</div>
+        </div>
+        <div class="bottom">
+          <div class="desc">Costi, spese e ripartizioni del viaggio.</div>
+          <div class="cta-row"><a class="cta" href="{{ base_url }}/rendiconto">Esplora →</a></div>
+        </div>
+      </article>
+
+      <article class="btn-card">
+        <div class="top">
+          <img src="{{ hero.img }}" alt="" loading="lazy" decoding="async" width="1200" height="800">
+          <div class="title">Link</div>
+        </div>
+        <div class="bottom">
+          <div class="desc">Attrazioni, hotel, ristoranti e risorse utili.</div>
+          <div class="cta-row"><a class="cta" href="{{ base_url }}/link">Esplora →</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+<script defer src="{{ base_url }}/assets/hero-fit.js"></script>
+{% endblock %}

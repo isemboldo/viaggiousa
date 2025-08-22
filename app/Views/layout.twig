@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  {# Tipografia: Inter #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  {% set meta_title = meta.title|default(block('title'))|default('Viaggio USA') %}
+  {% set meta_desc  = meta.description|default('Itinerario, giorni e sezioni del viaggio USA.') %}
+  {% set meta_url   = meta.url|default(base_url ~ '/') %}
+  {% set meta_image = meta.image|default(base_url ~ '/assets/images/cover-default.jpg') %}
+
+  <title>{% block title %}Viaggio USA{% endblock %}</title>
+  <meta name="description" content="{{ meta_desc }}"/>
+  <meta property="og:title" content="{{ meta_title }}"/>
+  <meta property="og:description" content="{{ meta_desc }}"/>
+  <meta property="og:url" content="{{ meta_url }}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="{{ meta_image }}"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="{{ meta_title }}"/>
+  <meta name="twitter:description" content="{{ meta_desc }}"/>
+  <meta name="twitter:image" content="{{ meta_image }}"/>
+
+  <link rel="stylesheet" href="{{ base_url }}/assets/style.css">
+</head>
+
+<body class="{{ body_class|default('') }}">
+  <div class="progress" id="progress"></div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="{{ base_url }}/">Viaggio USA 2026</a>
+      <nav class="nav" aria-label="principale">
+        <a href="{{ base_url }}/hub/new-york">New York</a>
+<a href="{{ base_url }}/hub/il-sud">Il Sud</a>
+<a href="{{ base_url }}/hub/orlando">Orlando</a>
+        <a href="{{ base_url }}/mappa">Mappa</a>
+        <a href="{{ base_url }}/rendiconto">Rendiconto</a>
+        <a href="{{ base_url }}/link">Link utili</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container footer">
+    <small>© {{ "now"|date("Y") }} — Env: {{ app_env }}</small>
+  </footer>
+
+  <script>
+    // Barra di progresso lettura
+    (function(){
+      var p = document.getElementById('progress');
+      if(!p) return;
+      var h = document.documentElement, b = document.body;
+      function onScroll(){
+        var st = h.scrollTop || b.scrollTop;
+        var sh = (h.scrollHeight || b.scrollHeight) - h.clientHeight;
+        p.style.width = Math.max(0, Math.min(100, (st / (sh||1)) * 100)) + '%';
+      }
+      document.addEventListener('scroll', onScroll, {passive:true});
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

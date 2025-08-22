@@ -1,0 +1,88 @@
+{% extends "layout.twig" %}
+{% block title %}{{ part.titolo }}{% endblock %}
+
+{% block content %}
+<section class="hub-page">
+
+  <!-- Titolo sezione -->
+  <header class="hub-header">
+    <h1 class="hub-title">{{ part.titolo }}</h1>
+  </header>
+
+  <!-- Carosello: solo immagini, cross-fade, ARIA -->
+  {% if slides and slides|length > 0 %}
+    <section class="hub-carousel" aria-label="Galleria foto della sezione">
+      <button class="hub-nav prev" aria-label="Immagine precedente" aria-controls="hubTrack" type="button">‹</button>
+
+      <div class="hub-viewport">
+        <div
+          class="hub-track"
+          id="hubTrack"
+          role="group"
+          aria-roledescription="carousel"
+          aria-live="polite"
+          aria-atomic="true"
+          data-count="{{ slides|length }}"
+          tabindex="0"
+        >
+          {% for g in slides %}
+            <figure
+              class="hub-slide{% if loop.first %} active{% endif %}"
+              role="group"
+              aria-roledescription="slide"
+              aria-label="Slide {{ loop.index }} di {{ slides|length }}"
+              aria-hidden="{{ loop.first ? 'false' : 'true' }}"
+            >
+              <img src="{{ g.img_url }}" alt="" loading="eager" decoding="async" width="1600" height="1000">
+            </figure>
+          {% endfor %}
+        </div>
+        <p id="carouselStatus" class="sr-only" aria-live="polite"></p>
+      </div>
+
+      <button class="hub-nav next" aria-label="Immagine successiva" aria-controls="hubTrack" type="button">›</button>
+    </section>
+  {% endif %}
+
+  <!-- Descrizione sezione -->
+  {% if part.descrizione %}
+    <section class="hub-desc">
+      <p>{{ part.descrizione|raw }}</p>
+    </section>
+  {% endif %}
+
+  <!-- Cards dei giorni -->
+  {% if part.giorni|length > 0 %}
+  <section class="hub-daysgrid">
+    <div class="hub-grid">
+      {% for d in part.giorni %}
+        <article class="btn-card">
+          <a class="top" href="{{ base_url }}/giorno/{{ d.id }}" aria-label="Giorno {{ d.giorno_num }} — {{ d.titolo }}">
+            {% if d.is_new %}
+    <div class="sticker-new" aria-label="Novità">Novità!</div>
+  {% endif %}
+            <img
+              src="{{ (d.immagine_copertina ? asset_url(d.immagine_copertina) : base_url ~ '/assets/images/cover-default.jpg') }}"
+              alt="" loading="lazy" decoding="async" width="1200" height="800">
+            {# SOPRA: solo “Giorno X” #}
+            <div class="title">Giorno {{ d.giorno_num }}</div>
+          </a>
+          <div class="bottom">
+            {# SOTTO: al posto della descrizione, mostra SOLO il titolo #}
+            <div class="desc">{{ d.titolo }}</div>
+            <div class="cta-row">
+              <a class="cta" href="{{ base_url }}/giorno/{{ d.id }}">Leggi →</a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+
+</section>
+
+<!-- JS del carosello (cross-fade, autoplay, a11y) -->
+<script defer src="{{ base_url }}/assets/hub-carousel.js"></script>
+{% endblock %}

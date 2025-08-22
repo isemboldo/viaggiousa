@@ -1,0 +1,1591 @@
+/* ===========================================================
+   VIAGGIO USA — Cinematic Public Theme (2025)
+   Mobile-first, zero dipendenze, tipografia Inter.
+   Mood: "road-movie" — calore del tramonto + accenti acqua.
+   =========================================================== */
+
+/* ===== Tokens ===== */
+:root{
+  /* Colori base */
+  --ink:        #0b1020;
+  --muted:      #6b7280;
+  --paper:      #ffffff;
+  --paper-2:    #f7fafc;
+  --edge:       #e5e7eb;
+
+  /* Colore unico primario (niente gradienti) */
+  --primary:    #2563eb;   /* blu elegante */
+  --primary-600:#1d4ed8;
+
+  /* Tipografia & layout */
+  --font:       "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --fs-hero:    clamp(1.8rem, 4.5vw, 3.2rem);
+  --fs-h1:      clamp(1.4rem, 3.5vw, 2.2rem);
+  --fs-h2:      clamp(1.2rem, 2.4vw, 1.6rem);
+  --fs-body:    1rem;
+  --fs-small:   .925rem;
+  --lh:         1.6;
+  --radius:     16px;
+  --radius-sm:  10px;
+  --gap:        14px;
+  --container:  1120px;
+
+  --shadow-s:   0 6px 18px rgba(11,16,32,.12);
+  --shadow-m:   0 12px 32px rgba(11,16,32,.18);
+  --ease-s:     cubic-bezier(.2,.8,.2,1);
+}
+
+
+/* ===== Base ===== */
+*{ box-sizing: border-box }
+html,body{ height:100% }
+body{
+  margin:0; font-family:var(--font); color:var(--ink); line-height:var(--lh);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #fefefe 0%, #f7f7fb 40%, #f3f4f6 100%),
+    #fbfbfe;
+}
+a{ color:#0ea5e9; text-decoration:none }
+a:hover{ color:#0284c7 }
+img{ max-width:100%; height:auto; display:block }
+
+/* ===== Layout ===== */
+.container{ max-width:var(--container); margin:0 auto; padding:1rem }
+@media (min-width:960px){ .container{ padding:2rem 1rem } }
+
+/* Header “glass” + progress */
+.header{
+  position:sticky; top:0; z-index:50;
+  backdrop-filter: blur(10px) saturate(1.2);
+  background: rgba(255,255,255,.75); border-bottom:1px solid rgba(2,6,23,.06);
+}
+.header-inner{ display:flex; align-items:center; gap:1rem; padding:.6rem 0 }
+.brand{ font-weight:800; letter-spacing:.2px; background:var(--brand-grad); -webkit-background-clip:text; background-clip:text; color:transparent }
+.nav{ margin-left:auto; display:flex; gap:.75rem; flex-wrap:wrap }
+.nav a{ color:var(--ink); padding:.45rem .7rem; border-radius:999px }
+.nav a:hover,.nav a:focus{ background:var(--paper-2) }
+
+/* progress bar */
+.progress{ position:fixed; top:0; left:0; height:3px; width:0%; background:var(--brand-grad); z-index:60 }
+
+/* ===== HERO ===== */
+/* Full-bleed: permetti a una sezione di uscire dal container */
+.fullbleed{
+  width: 100vw; position: relative; left: 50%; right: 50%;
+  margin-left: -50vw; margin-right: -50vw;
+}
+
+/* Hero cinematica */
+.hero{
+  position:relative; height: clamp(360px, 60vh, 700px); border-radius:0; /* niente radius: a tutta pagina */
+  overflow:hidden; box-shadow: var(--shadow-m);
+}
+.hero > img{ width:100%; height:100%; object-fit:cover; transform: scale(1.04); filter: saturate(1.05) contrast(1.03) }
+.hero::before{
+  content:""; position:absolute; inset:0;
+  background:
+    radial-gradient(120% 90% at 50% 10%, rgba(2,6,23,.0) 0%, rgba(2,6,23,.35) 45%, rgba(2,6,23,.65) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.55) 100%);
+}
+.hero-content{
+  position:absolute; inset:auto 0 0 0; color:#fff; padding: 1.25rem 1.25rem 1.75rem;
+  text-shadow: 0 2px 18px rgba(0,0,0,.35);
+}
+.hero h1{ font-size:var(--fs-hero); margin:.2rem 0; font-weight:800 }
+.hero p{ font-size:clamp(1rem,1.8vw,1.2rem); margin:.2rem 0; opacity:.96 }
+
+/* ===== Section shells ===== */
+.section{ margin:1.8rem 0 }
+.section h2{ font-size:var(--fs-h2); margin:0 0 .6rem 0; letter-spacing:.2px }
+
+/* ===== Tiles (Parti + CTA) ===== */
+.grid{ display:grid; gap:var(--gap) }
+.grid.auto{ grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+.tile{
+  position:relative; border-radius:var(--radius); overflow:hidden; background:#0f172a;
+  box-shadow: var(--shadow-s); transform: translateZ(0);
+  transition: transform .35s var(--ease-s), box-shadow .35s var(--ease-s);
+}
+.tile:hover{ transform: translateY(-6px); box-shadow: var(--shadow-m) }
+.tile-media{ position:absolute; inset:0 }
+.tile-media img{ width:100%; height:100%; object-fit:cover; transform:scale(1.02); transition: transform .6s var(--ease-s) }
+.tile:hover .tile-media img{ transform:scale(1.08) }
+.tile-overlay{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.80) 100%) }
+.tile-body{
+  position:relative; z-index:2; color:#fff; padding:16px; min-height:170px;
+  display:flex; flex-direction:column; justify-content:flex-end;
+}
+.tile h3{ margin:0 0 6px 0; font-weight:800; letter-spacing:.2px }
+.tile p{ margin:0 0 10px 0; color:rgba(255,255,255,.9) }
+.cta{
+  align-self:flex-start; padding:.55rem .9rem; border-radius:999px;
+  background: var(--primary); color:#fff; font-weight:700; text-decoration:none;
+  box-shadow: 0 6px 20px rgba(37,99,235,.25); transition: transform .2s var(--ease-s), background .2s var(--ease-s)
+}
+.cta:hover{ transform: translateY(-2px); background: var(--primary-600); }
+
+
+/* ===== Timeline orizzontale (home) ===== */
+.hscroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width: thin; padding-bottom:.25rem }
+.ribbon{ display:flex; gap:14px; padding:2px }
+.chip{
+  display:inline-flex; align-items:center; gap:.5rem; white-space:nowrap;
+  padding:.5rem .75rem; border:1px solid var(--edge); border-radius:999px; background:var(--paper);
+  box-shadow: var(--shadow-s);
+}
+.chip .n{ display:inline-grid; place-items:center; width:28px; height:28px; border-radius:999px; color:#fff; background:var(--brand-grad); font-weight:800 }
+
+/* ===== Giorno: storyboard di sezioni ===== */
+.story{
+  position:relative; display:grid; gap:16px;
+}
+.story::before{
+  content:""; position:absolute; left:calc(50% - 1px); top:0; bottom:0; width:2px;
+  background: linear-gradient(180deg, rgba(2,6,23,.08), rgba(2,6,23,.18));
+}
+.panel{
+  position:relative; border-radius:var(--radius); background:var(--paper); border:1px solid var(--edge);
+  box-shadow: var(--shadow-s); overflow:hidden; display:grid; gap:0;
+}
+.panel.alt{ margin-left:auto } /* alternanza destra/sinistra */
+.panel-head{
+  display:flex; align-items:center; gap:8px; padding:10px 12px; background: var(--paper-2); border-bottom:1px solid var(--edge)
+}
+.badge{ display:inline-block; padding:.2rem .55rem; border-radius:999px; font-size:var(--fs-small); background: rgba(20,184,166,.12); color:#0f766e; }
+.panel-body{ padding:14px }
+.panel-media img{ width:100%; height:320px; object-fit:cover }
+@media (min-width:900px){
+  .panel{ grid-template-columns: 48% 52% }
+  .panel.alt{ grid-template-columns: 52% 48% }
+  .panel-media img{ height:100% }
+}
+
+/* ===== Buttons Prev/Next ===== */
+.btn-row{ display:flex; justify-content:space-between; gap:var(--gap); margin-top:1rem }
+.btn{
+  display:inline-block; padding:.65rem 1rem; border-radius:999px; font-weight:700;
+  border:1px solid var(--edge); background:#fff; color:var(--ink); box-shadow: var(--shadow-s);
+  transition: transform .2s var(--ease-s), background .2s var(--ease-s)
+}
+.btn:hover{ transform:translateY(-2px); background:var(--paper-2) }
+
+/* ===== Footer ===== */
+.footer{ color:var(--muted); border-top:1px solid var(--edge); margin-top:2rem; padding:2rem 0 }
+
+/* ===== A11y/Motion ===== */
+@media (prefers-reduced-motion: reduce){
+  .tile, .hero, .btn{ transition:none !important; transform:none !important }
+}
+
+/* ===== Utilities ===== */
+.muted{ color:var(--muted) }
+.hidden{ display:none !important }
+
+/* Cards sezione: griglia pulita + media coerente (aspect-ratio) */
+.grid-sections{ display:grid; gap:var(--gap); grid-template-columns: 1fr; }
+@media (min-width: 720px){ .grid-sections{ grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1040px){ .grid-sections{ grid-template-columns: 1fr 1fr 1fr; } }
+
+.card{ background:var(--paper); border:1px solid var(--edge); border-radius:var(--radius); box-shadow: var(--shadow-s); overflow:hidden; display:flex; flex-direction:column; }
+.card-media{ aspect-ratio: 16 / 9; background: #eef2ff; }
+.card-media > img{ width:100%; height:100%; object-fit: cover; }
+.card-body{ padding: 12px 14px; display:flex; flex-direction:column; gap:.35rem; flex:1; }
+.card-title{ margin:.15rem 0 0 0; font-weight:700; }
+.card-pre{ display:inline-block; padding:.15rem .5rem; border-radius:999px; background:var(--paper-2); color:var(--muted); font-size:var(--fs-small) }
+
+/* === Homepage only — CLEAN === */
+
+/* 0) Niente header/progress SOLO in home */
+body.no-header .header,
+body.no-header .progress { display: none !important; }
+body.no-header main.container { padding-top: 0 !important; }
+
+/* 1) HERO fullscreen che si adatta al resize */
+.hero.home-hero{
+  height: 100svh;
+  min-height: 520px;
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+}
+@supports not (height: 100svh){
+  .hero.home-hero{ height: 100vh; }
+}
+.hero.home-hero > img{
+  width:100%; height:100%;
+  object-fit: cover; object-position: center;
+  display:block; filter: saturate(1.02) contrast(1.04);
+}
+/* Overlay SCURO (modifica qui se vuoi più/meno contrasto) */
+.hero.home-hero::before{
+  content:""; position:absolute; inset:0;
+  background:
+    radial-gradient(120% 90% at 50% 10%, rgba(0,0,0,.18) 0%, rgba(0,0,0,.62) 45%, rgba(0,0,0,.82) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.60) 100%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 2px, rgba(0,0,0,0) 2px 4px);
+}
+.hero.centered .hero-content{
+  position:absolute; top:50%; left:50%; transform: translate(-50%,-50%);
+  text-align:center; padding: 0 1rem; max-width: 880px; width: 100%;
+}
+.hero.centered h1{
+  font-size: var(--fs-hero);
+  margin: 0 0 .45rem; font-weight: 800; color: #fff;
+  text-shadow: 0 3px 22px rgba(0,0,0,.65), 0 0 1px rgba(255,255,255,.10);
+}
+.hero.centered p{
+  font-size: clamp(1rem,1.8vw,1.2rem);
+  color:#fff; opacity:.98; margin:0;
+  text-shadow: 0 2px 18px rgba(0,0,0,.6);
+}
+
+/* 2) Sezione bottoni */
+.home-sections{ margin: 1.8rem 0; }
+.home-sections .intro{ text-align:center; margin-bottom: 1rem; }
+.home-sections .intro h2{ margin:.2rem 0; font-size: var(--fs-h1); }
+.home-sections .intro p{ margin:.2rem 0; color: var(--muted); }
+
+/* Griglia responsiva: riempie lo spazio al meglio */
+.home-grid{
+  display:grid; gap: var(--gap);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* “Bottone” 2/3 (foto+titolo) + 1/3 (desc+CTA) con crop coerente */
+.btn-card{
+  display:grid; grid-template-rows: 2fr 1fr;
+  height: clamp(320px, 38vh, 380px);
+  border-radius: var(--radius); overflow:hidden;
+  box-shadow: var(--shadow-s); border:1px solid var(--edge);
+  background: var(--paper);
+}
+.btn-card .top{
+  position:relative; overflow:hidden; background:#0f172a;
+}
+.btn-card .top img{
+  width:100%; height:100%; object-fit: cover; object-position: center;
+  display:block; transform: translateZ(0);
+}
+/* Titolo in basso a sinistra sull’immagine */
+.btn-card .top .title{
+  position:absolute; left:12px; right:12px; bottom:12px;
+  display:inline-block; padding:.35rem .6rem; border-radius:10px;
+  background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.55) 100%);
+  color:#fff; font-weight:800;
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  text-shadow: 0 2px 12px rgba(0,0,0,.55);
+}
+.btn-card .bottom{
+  display:flex; flex-direction:column; justify-content:space-between; gap:.5rem;
+  padding: 12px 14px; background: var(--paper);
+}
+.btn-card .desc{ color: var(--muted); font-size: var(--fs-small); line-height: 1.5; }
+/* CTA a sinistra */
+.btn-card .cta-row{ display:flex; justify-content:flex-start; }
+.btn-card .cta{
+  display:inline-block; padding:.45rem .75rem; border-radius:999px;
+  background: var(--primary); color:#fff; font-weight:700; text-decoration:none;
+}
+.btn-card .cta:hover{ background: var(--primary-600); }
+
+/* === HOMEPAGE — HERO DARK & BIG TITLE =================================== */
+/* più scuro, due layer di overlay, e tipografia molto più grande */
+:root{
+  /* knob facile per scurire/illuminare l’hero */
+  --hero-darken: .25; /* aumenta fino a .55 se vuoi ancora più contrasto */
+}
+
+@media (max-width: 640px){
+  :root{ --hero-darken: .50; } /* su mobile scuriamo un po' di più */
+}
+
+/* Hero fullscreen (già presente), qui rinforziamo overlay e tipografia */
+.hero.home-hero{
+  height: 100svh; min-height: 520px; border-radius: 0; position: relative; overflow: hidden;
+}
+@supports not (height: 100svh){ .hero.home-hero{ height: 100vh; } }
+
+.hero.home-hero > img{
+  width:100%; height:100%; object-fit: cover; object-position: center;
+  display:block; filter: saturate(1.02) contrast(1.06);
+}
+
+/* LAYER 1: gradiente molto più marcato */
+.hero.home-hero::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 50% 8%, rgba(0,0,0,.30) 0%, rgba(0,0,0,.74) 45%, rgba(0,0,0,.90) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.70) 100%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 2px, rgba(0,0,0,0) 2px 4px);
+  z-index: 1;
+}
+
+/* LAYER 2: velo uniforme regolabile (usa la variabile --hero-darken) */
+.hero.home-hero::after{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index: 2;
+  background: rgba(0,0,0, var(--hero-darken));
+}
+
+/* Contenuto centrato: togliamo i “freni” di larghezza e facciamo respirare */
+.hero.centered .hero-content{
+  position:absolute; inset:auto 0 0 0; top:50%; transform: translateY(-50%);
+  z-index: 3; /* sopra gli overlay */
+  text-align:center;
+  width: min(92vw, 1400px); margin: 0 auto; padding-inline: 4vw;
+}
+
+/* Titolo molto più grande, usa quasi tutta la larghezza, con ombra forte */
+.hero.centered h1{
+  font-size: clamp(2.8rem, 8vw, 6rem);
+  line-height: 1.05;
+  margin: 0 0 .6rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-shadow:
+    0 8px 28px rgba(0,0,0,.75),
+    0 2px 18px rgba(0,0,0,.65),
+    0 0 1px rgba(255,255,255,.10);
+  text-wrap: balance; /* migliore spezzatura su 2 righe */
+}
+
+/* Sottotitolo più grande e leggibile */
+.hero.centered p{
+  font-size: clamp(1.15rem, 2.4vw, 1.6rem);
+  line-height: 1.35;
+  margin: 0;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0,0,0,.7), 0 1px 10px rgba(0,0,0,.6);
+}
+
+/* === HOMEPAGE — HERO full-width + overlay più leggero + centratura perfetta === */
+:root{
+  /* scurisci/schiarisci l'hero con una manopola unica */
+  --hero-darken: .15;  /* prima era ~.42: -12 punti */
+}
+
+/* Hero: usa tutto lo schermo e centra contenuto in entrambe le direzioni */
+.hero.home-hero{
+  height: 100svh; min-height: 520px; border-radius: 0; position: relative; overflow: hidden;
+}
+@supports not (height: 100svh){ .hero.home-hero{ height: 100vh; } }
+
+.hero.home-hero > img{
+  width:100%; height:100%; object-fit: cover; object-position: center; display:block;
+  filter: saturate(1.02) contrast(1.06);
+}
+
+/* Overlay alleggerito (–10/15 punti circa) */
+.hero.home-hero::before{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+  background:
+    radial-gradient(120% 90% at 50% 8%, rgba(0,0,0,.22) 0%, rgba(0,0,0,.60) 45%, rgba(0,0,0,.78) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.55) 100%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.028) 0 2px, rgba(0,0,0,0) 2px 4px);
+}
+/* Velo uniforme regolabile */
+.hero.home-hero::after{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:2;
+  background: rgba(0,0,0, var(--hero-darken));
+}
+
+/* Contenuto: 100% larghezza hero, centrato perfettamente */
+.hero.centered .hero-content{
+  position:absolute; inset:0; z-index:3;
+  display:flex; align-items:center; justify-content:center;
+  text-align:center; padding-inline: 3vw; /* bordo di sicurezza */
+  width: 100vw; /* usa tutta la finestra */
+}
+
+/* Titolo: una sola riga, niente wrap. La dimensione la regola JS (hero-fit.js) */
+.hero.centered h1{
+  white-space: nowrap; text-wrap: nowrap; overflow: visible;
+  line-height: 1.05; margin: 0 0 .6rem; font-weight: 900; letter-spacing: -0.01em;
+  color:#fff; text-shadow: 0 8px 28px rgba(0,0,0,.7), 0 2px 18px rgba(0,0,0,.6);
+}
+
+/* Sottotitolo leggibile ma meno ingombrante del titolo */
+.hero.centered p{
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  line-height: 1.35; margin: 0; font-weight: 600; color: #fff;
+  text-shadow: 0 4px 20px rgba(0,0,0,.65), 0 1px 10px rgba(0,0,0,.55);
+}
+/* === HOMEPAGE — hero: full width, centrata H/V, stack verticale ================ */
+
+/* usa tutta la finestra, niente bordi, contenuto sopra gli overlay */
+.hero.home-hero{
+  height: 100svh; min-height: 520px; border-radius: 0;
+  position: relative; overflow: hidden;
+}
+@supports not (height: 100svh){ .hero.home-hero{ height: 100vh; } }
+.hero.home-hero > img{
+  width:100%; height:100%; object-fit: cover; object-position: center;
+  display:block; filter: saturate(1.02) contrast(1.06);
+}
+
+/* overlay più leggero: mantieni la tua --hero-darken (es. .15) */
+.hero.home-hero::before{
+  content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 50% 8%, rgba(0,0,0,.20) 0%, rgba(0,0,0,.52) 45%, rgba(0,0,0,.68) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,.50) 100%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 2px, rgba(0,0,0,0) 2px 4px);
+}
+.hero.home-hero::after{
+  content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
+  background: rgba(0,0,0, var(--hero-darken, .15));
+}
+
+/* ⚠️ reset completo: niente top/left/transform ereditati, layout a colonna */
+.hero.centered .hero-content{
+  position:absolute; inset:0; z-index:3;
+  display:flex; flex-direction: column; /* titolo sopra, sottotitolo sotto */
+  align-items:center; justify-content:center; /* centro H/V reale */
+  text-align:center;
+  width:100%; max-width:none; /* niente “colonna” centrale */
+  padding-inline: 3vw; /* respiro ai lati */
+  top:auto; left:auto; transform:none; /* <— resetta vecchie regole */
+}
+
+/* Titolo: una sola riga, gestito dal JS fit; nessun taglio */
+.hero.centered h1{
+  white-space: nowrap; text-wrap: nowrap; overflow: visible;
+  margin: 0 0 .7rem; line-height: 1.05;
+  font-weight: 900; letter-spacing: -0.01em; color:#fff;
+  text-shadow: 0 8px 28px rgba(0,0,0,.7), 0 2px 18px rgba(0,0,0,.6);
+}
+
+/* Sottotitolo: sotto al titolo, non compresso, con larghezza “umana” */
+.hero.centered p{
+  white-space: normal;            /* nessun nowrap sul sottotitolo */
+  max-width: 1400px;              /* niente multi-colonne “visive” */
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  line-height: 1.35; margin: 0;
+  font-weight: 600; color:#fff;
+  text-shadow: 0 4px 20px rgba(0,0,0,.65), 0 1px 10px rgba(0,0,0,.55);
+}
+/* === HOMEPAGE — HERO center-in-image + 20% side margins ================== */
+/* usa tutta la finestra per la hero */
+.hero.home-hero{
+  height: 100svh; min-height: 520px; border-radius: 0; position: relative; overflow: hidden;
+}
+@supports not (height: 100svh){ .hero.home-hero{ height: 100vh; } }
+
+.hero.home-hero > img{
+  width:100%; height:100%; object-fit: cover; object-position: center; display:block;
+}
+
+/* overlay resta quello già impostato (usa --hero-darken=.15 come preferisci) */
+
+/* CONTENUTO: centrato h/v rispetto all'IMMAGINE, con margini laterali ~20% */
+.hero.home-hero.centered .hero-content{
+  position:absolute; z-index:3; top:50%; left:50%;
+  transform: translate(-50%, -50%);                  /* vero centro nella hero */
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center;
+
+  /* larghezza = 60% viewport (20% margini per lato), con limiti sani */
+  width: clamp(320px, 60vw, 1200px);
+  padding: 0;                                        /* niente padding che sballa il fit */
+}
+
+/* TITOLO: una sola riga, niente tagli */
+.hero.home-hero.centered h1{
+  white-space: nowrap; text-wrap: nowrap; overflow: visible;
+  margin: 0 0 .7rem; line-height: 1.05;
+  font-weight: 900; letter-spacing: -0.01em; color:#fff;
+  text-shadow: 0 8px 28px rgba(0,0,0,.7), 0 2px 18px rgba(0,0,0,.6);
+}
+
+/* SOTTOTITOLO: sotto al titolo, correttamente disposto */
+.hero.home-hero.centered p{
+  white-space: normal;
+  max-width: 100%;        /* usa tutta la width del blocco (60vw) */
+  margin: 0;
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  line-height: 1.35; font-weight: 600; color:#fff;
+  text-shadow: 0 4px 20px rgba(0,0,0,.65), 0 1px 10px rgba(0,0,0,.55);
+}
+/* ==================== HUB PAGE ==================== */
+.hub-page{ margin: 1.6rem 0; }
+.hub-header{ margin-bottom: 1rem; }
+.hub-title{
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  margin: 0;
+}
+
+/* Carosello */
+.hub-carousel{
+  position: relative;
+  margin: 1rem 0 1.4rem;
+}
+.hub-track{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(260px, 28vw, 380px);
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: .5rem;
+}
+.hub-slide{
+  scroll-snap-align: start;
+  border-radius: 14px;
+  border: 1px solid var(--edge);
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow: var(--shadow-s);
+  text-decoration: none;
+  color: inherit;
+  display: flex; flex-direction: column;
+}
+.hub-slide .imgwrap{ position: relative; aspect-ratio: 16 / 10; background: #eee; }
+.hub-slide img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.hub-slide .caption{
+  padding: 10px 12px;
+  font-size: .95rem;
+  color: var(--ink);
+  border-top: 1px solid var(--edge);
+  background: var(--paper);
+}
+
+/* Sticker Novità! (overlay) */
+.badge-new{
+  position: absolute; top: 10px; left: 10px;
+  background: #16a34a; color: #fff; font-weight: 800;
+  padding: .25rem .5rem; border-radius: 999px; font-size: .85rem;
+  box-shadow: 0 6px 20px rgba(22,163,74,.35);
+}
+
+/* Pulsanti navigazione carosello */
+.hub-nav{
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--edge);
+  background: #fff; color: var(--ink);
+  box-shadow: var(--shadow-s);
+  display: grid; place-items: center; font-size: 22px; line-height: 1;
+}
+.hub-nav.prev{ left: -6px; }
+.hub-nav.next{ right: -6px; }
+.hub-nav:hover{ background: var(--paper-2); }
+
+/* Descrizione */
+.hub-desc{ margin: .6rem 0 1.2rem; color: var(--muted); }
+
+/* Lista giorni (bottoni) */
+.hub-days-title{
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  margin: 0 0 .6rem 0;
+}
+.hub-day-list{
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 10px;
+}
+.hub-day-item{ margin: 0; }
+.hub-day-btn{
+  position: relative;
+  display: grid; grid-template-columns: 1fr auto; gap: 10px;
+  align-items: center;
+  border: 1px solid var(--edge);
+  background: var(--paper);
+  border-radius: 12px; padding: 10px 12px;
+  text-decoration: none; color: inherit;
+  box-shadow: var(--shadow-s);
+}
+.hub-day-btn .badge-new{
+  position: static; /* nel bottone sta “in riga” */
+  margin-right: 8px;
+}
+.hub-day-btn .label{ font-weight: 700; }
+.hub-day-btn .cta{
+  justify-self: end; font-weight: 700; color: var(--primary);
+}
+.hub-day-btn:hover{ background: var(--paper-2); }
+/* ==================== HUB PAGE ==================== */
+.hub-page{ margin: 1.6rem 0; }
+.hub-header{ margin-bottom: 1rem; }
+.hub-title{
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  margin: 0;
+}
+
+/* Carosello: SOLO IMMAGINI */
+.hub-carousel{ position: relative; margin: 1rem 0 1.4rem; }
+.hub-track{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(260px, 28vw, 380px);
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: .5rem;
+}
+.hub-slide{
+  scroll-snap-align: start;
+  border-radius: 14px;
+  border: 1px solid var(--edge);
+  overflow: hidden;
+  background: #000; /* fondo neutro mentre carica */
+  box-shadow: var(--shadow-s);
+}
+.hub-slide .imgwrap{ position: relative; aspect-ratio: 16 / 10; }
+.hub-slide img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Frecce del carosello */
+.hub-nav{
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--edge);
+  background: #fff; color: var(--ink);
+  box-shadow: var(--shadow-s);
+  display: grid; place-items: center; font-size: 22px; line-height: 1;
+}
+.hub-nav.prev{ left: -6px; }
+.hub-nav.next{ right: -6px; }
+.hub-nav:hover{ background: var(--paper-2); }
+
+/* Cards dei giorni — stile “bottoni home”, griglia responsiva */
+.hub-daysgrid{ margin-top: 1.2rem; }
+.hub-grid{
+  display:grid; gap: var(--gap);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* Re-uso di .btn-card con piccole garanzie per uniformità */
+.btn-card{
+  display:grid; grid-template-rows: 2fr 1fr; height: clamp(320px, 38vh, 380px);
+  border-radius: var(--radius); overflow:hidden;
+  box-shadow: var(--shadow-s); border:1px solid var(--edge);
+  background: var(--paper);
+}
+.btn-card .top{
+  position:relative; overflow:hidden; background:#0f172a;
+  display:block; /* per rendere tutta la parte superiore cliccabile */
+}
+.btn-card .top img{
+  width:100%; height:100%; object-fit: cover; object-position: center;
+  display:block;
+}
+.btn-card .top .title{
+  position:absolute; left:12px; right:12px; bottom:12px;
+  display:inline-block; padding:.35rem .6rem; border-radius:10px;
+  background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.55) 100%);
+  color:#fff; font-weight:800;
+  font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+  text-shadow: 0 2px 12px rgba(0,0,0,.55);
+}
+.btn-card .bottom{
+  display:flex; flex-direction:column; justify-content:space-between; gap:.5rem;
+  padding: 12px 14px; background: var(--paper);
+}
+.btn-card .desc{ color: var(--muted); font-size: var(--fs-small); line-height: 1.5; }
+.btn-card .cta-row{ display:flex; justify-content:flex-start; }
+.btn-card .cta{
+  display:inline-block; padding:.45rem .75rem; border-radius:999px;
+  background: var(--primary); color:#fff; font-weight:700; text-decoration:none;
+}
+.btn-card .cta:hover{ background: var(--primary-600); }
+
+/* ===== HUB — CAROSELLO 1 SLIDE PER VOLTA ===== */
+.hub-carousel{ position: relative; margin: 1rem 0 1.4rem; }
+
+.hub-viewport{
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--edge);
+  box-shadow: var(--shadow-s);
+  /* stessa “superficie” del vecchio carosello: 16:10; puoi regolare se serve */
+  aspect-ratio: 16 / 10;
+  background: #000;
+}
+
+/* Track a FLEX: 1 slide = 100% larghezza viewport */
+.hub-track{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform .45s ease;
+  will-change: transform;
+}
+
+/* Ogni slide occupa 100% della viewport */
+.hub-slide{
+  flex: 0 0 100%;
+  height: 100%;
+}
+.hub-slide img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;      /* ← crop, nessuna deformazione */
+  object-position: center;
+  display: block;
+}
+
+/* Frecce (invariato) */
+.hub-nav{
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--edge);
+  background: #fff; color: var(--ink);
+  box-shadow: var(--shadow-s);
+  display: grid; place-items: center; font-size: 22px; line-height: 1;
+  z-index: 2;
+}
+.hub-nav.prev{ left: -6px; }
+.hub-nav.next{ right: -6px; }
+.hub-nav:hover{ background: var(--paper-2); }
+
+/* === HUB CAROUSEL – FIX: 1 slide per volta, niente scrollbar ============ */
+
+/* Il viewport maschera qualsiasi eccedenza */
+.hub-viewport{
+  position: relative;
+  overflow: hidden !important;
+  border-radius: 14px;
+  border: 1px solid var(--edge);
+  box-shadow: var(--shadow-s);
+  aspect-ratio: 16 / 10;
+  background: #000;
+}
+
+/* Il track NON deve più essere uno scroller né una grid */
+.hub-track{
+  display: flex !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;            /* ← niente barre */
+  padding: 0 !important;                  /* ← toglie padding .5rem legacy */
+  gap: 0 !important;                      /* ← toglie gap legacy */
+  scroll-snap-type: none !important;      /* ← disattiva snap legacy */
+  -webkit-overflow-scrolling: auto !important;
+}
+
+/* Ogni slide occupa ESATTAMENTE la viewport */
+.hub-slide{
+  flex: 0 0 100% !important;
+  height: 100% !important;
+  margin: 0 !important;                   /* ← <figure> ha margin di default */
+  border: 0 !important;
+}
+
+/* L’immagine riempie e viene tagliata (crop) */
+.hub-slide img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+}
+/* ===== HUB — CAROSELLO 1 SLIDE PER VOLTA (loop-ready) ===== */
+.hub-carousel{ position: relative; margin: 1rem 0 1.4rem; }
+
+.hub-viewport{
+  position: relative;
+  overflow: hidden !important;
+  border-radius: 14px;
+  border: 1px solid var(--edge);
+  box-shadow: var(--shadow-s);
+  aspect-ratio: 16 / 10; /* regola qui l'altezza ottica */
+  background: #000;
+}
+
+/* Track a FLEX: ogni slide = 100% viewport */
+.hub-track{
+  display: flex !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  scroll-snap-type: none !important;
+  -webkit-overflow-scrolling: auto !important;
+  transition: transform .45s ease; /* il JS la gestisce */
+  will-change: transform;
+}
+
+/* Slide = 100% viewport; azzera margine <figure> */
+.hub-slide{
+  flex: 0 0 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+.hub-slide img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;   /* crop */
+  object-position: center !important;
+  display: block !important;
+}
+
+/* Frecce */
+.hub-nav{
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--edge);
+  background: #fff; color: var(--ink);
+  box-shadow: var(--shadow-s);
+  display: grid; place-items: center; font-size: 22px; line-height: 1;
+  z-index: 2;
+}
+.hub-nav.prev{ left: -6px; }
+.hub-nav.next{ right: -6px; }
+.hub-nav:hover{ background: var(--paper-2); }
+
+/* ===== HUB — CAROSELLO 1 SLIDE, LOOP, FADE-IN ALLA PRIMA IMMAGINE ===== */
+.hub-carousel{ position: relative; margin: 1rem 0 1.4rem; width: 100%; }
+
+.hub-viewport{
+  position: relative;
+  width: 100%;
+  overflow: hidden !important;
+  border-radius: 14px;
+  border: 1px solid var(--edge);
+  box-shadow: var(--shadow-s);
+  aspect-ratio: 16 / 10;      /* cambia a 21/9 o 4/3 se vuoi */
+  min-height: 240px;          /* fallback per vecchi browser */
+  background: #000;
+
+  /* fade-in quando pronto */
+  opacity: 1; transition: opacity .25s ease;
+}
+.hub-viewport[data-ready="0"]{ opacity: 0; }
+
+.hub-track{
+  display: flex !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  scroll-snap-type: none !important;
+  -webkit-overflow-scrolling: auto !important;
+  transition: transform .45s ease;
+  will-change: transform;
+}
+
+.hub-slide{
+  flex: 0 0 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+.hub-slide img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;     /* crop */
+  object-position: center !important;
+  display: block !important;
+}
+
+/* Frecce */
+.hub-nav{
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--edge);
+  background: #fff; color: var(--ink);
+  box-shadow: var(--shadow-s);
+  display: grid; place-items: center; font-size: 22px; line-height: 1;
+  z-index: 2;
+}
+.hub-nav.prev{ left: -6px; }
+.hub-nav.next{ right: -6px; }
+.hub-nav:hover{ background: var(--paper-2); }
+
+/* === HUB CAROUSEL — VISIBILITY HOTFIX ==================== */
+.hub-viewport{ opacity: 1 !important; }
+.hub-viewport[data-ready="0"]{ opacity: 1 !important; }
+/* === HUB — CAROSELLO “CROSS-FADE” ROBUSTO ============================== */
+.hub-viewport{
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--edge);
+  box-shadow: var(--shadow-s);
+  aspect-ratio: 16 / 10;
+  min-height: 240px;
+  background: #000;
+}
+
+/* Il track diventa un layer relativo; ogni slide è assoluta e copre tutto */
+.hub-track{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Una sola immagine visibile alla volta; le altre stanno sotto (opacity 0) */
+.hub-slide{
+  position: absolute;
+  inset: 0;
+  margin: 0; border: 0;
+  opacity: 0;
+  transition: opacity .5s ease;
+}
+.hub-slide.active{ opacity: 1; }
+
+/* L’immagine riempie il box, tagliando senza deformare */
+.hub-slide img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Frecce (invariato) */
+.hub-nav{
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--edge);
+  background: #fff; color: var(--ink);
+  box-shadow: var(--shadow-s);
+  display: grid; place-items: center; font-size: 22px; line-height: 1;
+}
+.hub-nav.prev{ left: -6px; }
+.hub-nav.next{ right: -6px; }
+.hub-nav:hover{ background: var(--paper-2); }
+
+/* === HUB - Carosello 5:2 + full-bleed =================================== */
+/* Ratio 5:2 (più largo e meno alto) */
+.hub-page .hub-carousel .hub-viewport{
+  aspect-ratio: 5 / 2;
+  min-height: 220px; /* fallback per browser senza aspect-ratio */
+}
+
+/* HUB — spazi uguali sopra/sotto il titolo (niente margin-collapsing) */
+:root{ --hub-title-gap: clamp(16px, 2.4vw, 28px); }
+
+.hub-page .hub-header{
+  /* spazi uguali */
+  padding-block: var(--hub-title-gap);
+  /* niente margini = niente collapsing con header/carousel */
+  margin: 0;
+  text-align: center;
+}
+
+.hub-page .hub-title{
+  margin: 0;            /* azzera i margini di default dell'h1 */
+  line-height: 1.2;
+}
+
+/* il distacco sotto è già dato dal padding-bottom del wrapper */
+.hub-page .hub-carousel{
+  margin-top: 0;
+}
+
+:root{ --hub-gap-top: 1px; --hub-gap-bottom: 48px; }
+.hub-page .hub-header{ padding-top: var(--hub-gap-top); padding-bottom: var(--hub-gap-bottom); }
+
+/* === HUB — spaziatura verticale tra carosello, descrizione e bottoni ===== */
+:root{
+  /* aumenta/diminuisci qui la spaziatura */
+  --hub-gap: clamp(14px, 4vw, 46px);
+  --hub-gap-lg: clamp(22px, 5vw, 52px); /* un filo più ampio dove serve */
+}
+
+/* più spazio sotto il carosello */
+.hub-page .hub-carousel{
+  margin-bottom: var(--hub-gap-lg);
+}
+
+/* spazio sopra e sotto la descrizione */
+.hub-page .hub-desc{
+  margin-top: var(--hub-gap);
+  margin-bottom: var(--hub-gap);
+}
+
+/* spazio sopra la griglia “bottoni” (cards dei giorni) */
+.hub-page .hub-daysgrid{
+  margin-top: var(--hub-gap);
+}
+
+/* opzionale: su desktop ancora più arioso */
+@media (min-width: 1000px){
+  .hub-page .hub-carousel{ margin-bottom: calc(var(--hub-gap-lg) + 8px); }
+  .hub-page .hub-desc{ margin-top: var(--hub-gap-lg); margin-bottom: var(--hub-gap-lg); }
+  .hub-page .hub-daysgrid{ margin-top: var(--hub-gap-lg); }
+}
+/* === HUB — descrizione centrata e più stretta =========================== */
+:root{
+  /* larghezza massima della descrizione (in caratteri) */
+  --hub-desc-max: 68ch;
+}
+
+.hub-page .hub-desc{
+  text-align: center;            /* testo centrato */
+}
+
+.hub-page .hub-desc > p{
+  max-width: var(--hub-desc-max);/* limita la larghezza in centro */
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Se la descrizione contiene più paragrafi/lista, centra tutto con gli stessi limiti */
+.hub-page .hub-desc > *{
+  max-width: var(--hub-desc-max);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Hub: rendi il titolo (ora in .desc) più evidente nelle card giorno */
+.hub-page .btn-card .bottom .desc{
+  color: var(--ink);
+  font-weight: 700;
+  font-size: clamp(1.02rem, 1.8vw, 1.2rem);
+}
+/* Header: stile brand-link */
+.header .brand{
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.header .brand:hover{ opacity: .9; }
+
+.sticker-new{
+  position:absolute; top:10px; left:10px; z-index:3;
+  padding:.28rem .55rem; border-radius:999px;
+  font-size:.82rem; font-weight:800; letter-spacing:.2px;
+  color:#fff; background:linear-gradient(135deg,#ef4444,#f97316);
+  box-shadow:0 6px 18px rgba(11,16,32,.18);
+  user-select:none; -webkit-user-select:none;
+}
+/* ============ GIORNO — Occhiello, immagini uniformi, alternanza ============ */
+
+/* Grid a due aree: MEDIA e BODY. Su mobile: verticali; su desktop: affiancate. */
+.day-page .panel{
+  display: grid;
+  grid-template-areas:
+    "media"
+    "body";
+  gap: 0;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--edge);
+  box-shadow: var(--shadow-s);
+  overflow: hidden;
+}
+
+/* Alternanza: a schermi larghi, scambia le aree (destra/sinistra) */
+@media (min-width: 900px){
+  .day-page .panel{
+    grid-template-columns: 48% 52%;
+    grid-template-areas: "media body";
+  }
+  .day-page .panel.alt{
+    grid-template-columns: 52% 48%;
+    grid-template-areas: "body media";
+  }
+}
+
+/* MEDIA: dimensione uniforme per tutte le immagini */
+:root{ --day-media-ratio: 16 / 10; } /* puoi regolare qui il rapporto */
+.day-page .panel-media{
+  grid-area: media;
+  position: relative;
+  aspect-ratio: var(--day-media-ratio);
+  min-height: 220px;                /* fallback e base mobile */
+  background: #0f172a;              /* tinta di fondo se manca l’immagine */
+}
+@media (min-width: 900px){
+  .day-page .panel-media{
+    min-height: 320px;              /* un po’ più alta su desktop */
+  }
+}
+.day-page .panel-media img{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center; /* taglia senza deformare */
+  display: block;
+}
+
+/* BODY */
+.day-page .panel-body{
+  grid-area: body;
+  padding: 14px;
+}
+
+/* Intestazione della scheda */
+.day-page .panel-head{
+  display: grid;
+  grid-template-columns: 1fr auto;      /* titolo a sinistra, contatori a destra */
+  align-items: end;
+  gap: 8px 12px;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--edge);
+}
+
+/* Occhiello (sovratitolo) sopra al titolo */
+.day-page .panel-head .eyebrow{
+  grid-column: 1 / -1;                  /* riga intera */
+  order: -1;                             /* sopra a tutto */
+  font-size: .86rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #1d4ed8;
+  opacity: .9;
+  margin-bottom: 2px;
+}
+
+.day-page .panel-head .h3{
+  margin: 0; 
+  font-size: clamp(1.05rem, 2.1vw, 1.4rem);
+  line-height: 1.25;
+}
+
+/* Contatori a destra del titolo */
+.day-page .panel-head .counters{
+  margin-left: auto;
+  display: flex; gap: 12px;
+  color: var(--muted); font-weight: 700;
+}
+
+/* Rich text */
+.day-page .richtext p{ margin: .6rem 0 }
+.day-page .richtext img{ max-width:100%; height:auto; border-radius:8px }
+
+/* ============================================================
+   DAY PAGE — override definitivi (hero full-bleed, immagini uniformi,
+   niente hairline, titolo con sfondo dedicato)
+   ============================================================ */
+
+/* 0) Safety contro hairline e overflow orizzontale */
+.day-page{ overflow-x: hidden; }
+
+/* 1) HERO davvero full-bleed e centrata (fallback 100vw + fix 100dvw) */
+.day-page .day-hero{
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  aspect-ratio: 21 / 9;       /* cambia se vuoi più/meno alta */
+  min-height: 280px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--edge);
+  left: auto; right: auto; transform: none; /* annulla vecchie regole */
+}
+@supports (width: 100dvw){
+  .day-page .day-hero{
+    width: 100dvw;
+    margin-left: calc(50% - 50dvw);
+    margin-right: calc(50% - 50dvw);
+  }
+}
+.day-page .day-hero > img{
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+
+/* 2) Immagini delle card: tutte stesse dimensioni (rapporto fisso) */
+:root{
+  --day-media-ratio: 16 / 10;  /* 3/2, 4/3 o 21/9 se vuoi più panoramico */
+  --card-frame-pad: 10px;
+  --card-frame-radius: 14px;
+}
+.day-page .panel-media{
+  position: relative;
+  aspect-ratio: var(--day-media-ratio); /* fisso su TUTTE le larghezze */
+  min-height: 220px;
+  background: transparent;
+  overflow: hidden;
+}
+@media (min-width: 900px){
+  .day-page .panel-media{ min-height: 320px; }
+}
+/* cornice trasparente interna + crop uniforme */
+.day-page .panel-media img{
+  position: absolute;
+  inset: var(--card-frame-pad);
+  width: calc(100% - 2 * var(--card-frame-pad));
+  height: calc(100% - 2 * var(--card-frame-pad));
+  object-fit: cover; object-position: center; /* centrata anche verticalmente */
+  border-radius: var(--card-frame-radius);
+  display: block;
+}
+.day-page .panel-media::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: calc(var(--card-frame-radius) + var(--card-frame-pad));
+  border: 1px solid rgba(2,6,23,.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
+  pointer-events:none;
+}
+
+/* 3) Occhiello sopra al titolo e SENZA sfondo; sfondo SOLO al titolo */
+.day-page .panel-head{
+  display: grid !important;                 /* forza grid, niente flex */
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 8px 12px;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--edge);
+  background: transparent !important;       /* no fondo condiviso */
+}
+.day-page .panel-head .eyebrow{
+  grid-column: 1 / -1;
+  order: -1;
+  margin: 0 0 6px 0;
+  font-size: .86rem; font-weight: 800; letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #1d4ed8; opacity:.95;
+  background: transparent;                  /* occhiello senza sfondo */
+}
+.day-page .panel-head .h3{
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap; overflow: hidden;    /* mai andare a capo */
+  display:inline-block;
+  padding: .15rem .5rem;
+  border-radius: 10px;
+  background: var(--paper-2);               /* sfondo SOLO del titolo */
+  box-shadow: 0 1px 0 rgba(0,0,0,.04) inset;
+  font-size: clamp(18px, 2.2vw, 26px);      /* dinamica base (puoi tenere anche l’auto-fit JS) */
+}
+.day-page .panel-head .counters{
+  margin-left:auto; display:flex; gap:12px;
+  color: var(--muted); font-weight:700;
+}
+
+/* 4) Hard-kill di qualunque “hairline” residua dietro le card */
+.day-page .container, .day-page .story{
+  background: transparent !important;
+  background-image: none !important;
+}
+/* ===================== DAY PAGE — FIX DEFINITIVI ====================== */
+
+/* 0) Safety: niente scroll orizzontale e niente “hairline” di bordo */
+html, body{ overflow-x: hidden; }
+.day-page{ overflow-x: hidden; }
+
+/* 1) HERO: full-bleed reale, centrata rispetto al viewport */
+.day-page .day-hero{
+  position: relative;
+  width: 100vw;
+  /* tecnica full-bleed: spingi i margini al bordo del viewport */
+  margin-left: calc(50% - 50vw - .5px);
+  margin-right: calc(50% - 50vw - .5px);
+  aspect-ratio: 21 / 9;     /* cambia se vuoi più/meno alta */
+  min-height: 280px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--edge);
+}
+@supports (width: 100dvw){
+  .day-page .day-hero{
+    width: 100dvw;
+    margin-left: calc(50% - 50dvw - .5px);
+    margin-right: calc(50% - 50dvw - .5px);
+  }
+}
+.day-page .day-hero > img{
+  width: 100%; height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* 2) Toolbar Prev / Index / Next: orizzontale */
+.day-page .toolbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-top: .4rem;
+}
+.day-page .toolbar .left,
+.day-page .toolbar .center,
+.day-page .toolbar .right{ display: flex; align-items: center; }
+.day-page .toolbar .center{ justify-content: center; flex: 0 0 auto; }
+.day-page .toolbar .left,
+.day-page .toolbar .right{ flex: 1 1 0; }
+.day-page .toolbar .left{ justify-content: flex-start; }
+.day-page .toolbar .right{ justify-content: flex-end; }
+
+/* 3) Card immagine: stessa altezza per tutte + centratura verticale */
+:root{
+  --day-media-ratio: 16 / 10;  /* imposta il rapporto unico per TUTTE le card */
+  --card-frame-pad: 10px;
+  --card-frame-radius: 14px;
+}
+.day-page .panel{ overflow: hidden; }
+
+/* stesso ratio su tutti i breakpoint → stessa “altezza ottica” per ogni card */
+.day-page .panel-media{
+  position: relative;
+  aspect-ratio: var(--day-media-ratio);
+  min-height: 220px;
+  background: transparent;
+  overflow: hidden;
+}
+@media (min-width: 900px){
+  .day-page .panel-media{ min-height: 320px; }
+}
+
+/* immagine centrata verticalmente/orizzontalmente, dentro una “cornice” */
+.day-page .panel-media img{
+  position: absolute;
+  inset: var(--card-frame-pad);
+  width: calc(100% - 2 * var(--card-frame-pad));
+  height: calc(100% - 2 * var(--card-frame-pad));
+  object-fit: cover;
+  object-position: 50% 50%; /* centrata anche in verticale */
+  border-radius: var(--card-frame-radius);
+  display: block;
+}
+/* bordo sottilissimo della cornice */
+.day-page .panel-media::before{
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: calc(var(--card-frame-radius) + var(--card-frame-pad));
+  border: 1px solid rgba(2,6,23,.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
+  pointer-events: none;
+}
+
+/* 4) Occhiello sopra, senza sfondo; sfondo SOLO al titolo */
+.day-page .panel-head{
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 8px 12px;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--edge);
+  background: transparent !important;
+}
+.day-page .panel-head .eyebrow{
+  grid-column: 1 / -1;
+  order: -1;
+  margin: 0 0 6px 0;
+  font-size: .86rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #1d4ed8;
+  background: transparent;
+}
+.day-page .panel-head .h3{
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;      /* MAI a capo */
+  overflow: hidden;         /* sicurezza */
+  display: inline-block;
+  padding: .15rem .5rem;
+  border-radius: 10px;
+  background: var(--paper-2);          /* sfondo SOLO del titolo */
+  box-shadow: 0 1px 0 rgba(0,0,0,.04) inset;
+  font-size: clamp(18px, 2.2vw, 26px); /* dinamica base */
+}
+.day-page .panel-head .counters{
+  margin-left: auto;
+  display: flex; gap: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* 5) Hard kill di qualunque “riga verticale” residua dietro le card */
+.day-page, .day-page .container, .day-page .story{
+  background: transparent !important;
+  background-image: none !important;
+}
+/* =============== DAY PAGE — HERO full-bleed senza “riga” =============== */
+html, body { overflow-x: hidden; } /* evita scroll orizzontale */
+.day-page { overflow-x: hidden; }
+
+.day-page .day-hero{
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw - 1px);
+  margin-right: calc(50% - 50vw - 1px);
+  min-height: clamp(260px, 34vh, 520px);
+  /* nessun aspect-ratio fisso: lasciamo all’altezza responsiva */
+  overflow: hidden;
+}
+@supports (width: 100dvw){
+  .day-page .day-hero{
+    width: 100dvw;
+    margin-left: calc(50% - 50dvw - 1px);
+    margin-right: calc(50% - 50dvw - 1px);
+  }
+}
+.day-page .day-hero > img{
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+/* =============== DAY PAGE — Toolbar orizzontale ======================== */
+.day-page .toolbar{
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-top: .4rem;
+}
+.day-page .toolbar .left,
+.day-page .toolbar .center,
+.day-page .toolbar .right { display: flex; align-items: center; }
+.day-page .toolbar .left  { justify-content: flex-start;  flex: 1 1 0; }
+.day-page .toolbar .center{ justify-content: center;      flex: 0 0 auto; }
+.day-page .toolbar .right { justify-content: flex-end;    flex: 1 1 0; }
+/* =============== DAY PAGE — Media uniformi e centrate ================== */
+:root{
+  --card-frame-pad: 10px;
+  --card-frame-radius: 14px;
+  /* altezza unica per tutte le card, responsive */
+  --day-media-h-m: 220px;
+  --day-media-h-d: 360px;
+}
+
+.day-page .panel{ overflow: hidden; }
+
+/* Contenitore media con altezza fissa (uguale per tutte) */
+.day-page .panel-media{
+  position: relative;
+  height: var(--day-media-h-m);
+  overflow: hidden;
+  background: transparent;
+}
+@media (min-width: 900px){
+  .day-page .panel-media{ height: var(--day-media-h-d); }
+}
+
+/* Immagine “incorniciata”, taglio senza deformare e centrata in verticale */
+.day-page .panel-media img{
+  position: absolute;
+  inset: var(--card-frame-pad);
+  width: calc(100% - 2 * var(--card-frame-pad));
+  height: calc(100% - 2 * var(--card-frame-pad));
+  object-fit: cover;
+  object-position: 50% 50%; /* centra anche verticalmente */
+  border-radius: var(--card-frame-radius);
+  display: block;
+}
+
+/* Cornice sottile attorno al riquadro immagine */
+.day-page .panel-media::before{
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: calc(var(--card-frame-radius) + var(--card-frame-pad));
+  border: 1px solid rgba(2,6,23,.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
+  pointer-events: none;
+}
+
+/* ===== GIORNO — hotfix mirati, non impattano altre pagine ===== */
+
+/* 0) Elimina la riga verticale dietro le card (proviene da .story::before) */
+.day-page .story::before { content: none !important; }
+
+/* 1) HERO davvero a tutta finestra (full-bleed) */
+.day-page,
+.day-page .day-hero { overflow-x: hidden; }
+.day-page .day-hero{
+  position: relative;
+  width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  min-height: clamp(260px, 34vh, 520px);
+  overflow: hidden;
+  border-bottom: 1px solid var(--edge);
+}
+@supports (width: 100dvw){
+  .day-page .day-hero{
+    width: 100dvw !important;
+    margin-left: calc(50% - 50dvw) !important;
+    margin-right: calc(50% - 50dvw) !important;
+  }
+}
+.day-page .day-hero > img{
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+
+/* 2) Toolbar Prev/Index/Next: di nuovo su UNA riga */
+.day-page .toolbar{
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+.day-page .toolbar .left,
+.day-page .toolbar .center,
+.day-page .toolbar .right{ display:flex; align-items:center; }
+.day-page .toolbar .left{  justify-content:flex-start;  flex:1 1 0; }
+.day-page .toolbar .center{ justify-content:center;     flex:0 0 auto; }
+.day-page .toolbar .right{ justify-content:flex-end;    flex:1 1 0; }
+
+/* 3) Media delle card: stessa altezza per tutte + centratura verticale */
+:root{
+  /* altezza unica delle immagini (mobile/desktop) */
+  --day-media-h-m: 220px;
+  --day-media-h-d: 360px;
+  --card-frame-pad: 10px;
+  --card-frame-radius: 14px;
+}
+.day-page .panel-media{
+  position: relative;
+  height: var(--day-media-h-m) !important; /* fissa su mobile */
+  overflow: hidden;
+  background: transparent;
+}
+@media (min-width: 900px){
+  .day-page .panel-media{ height: var(--day-media-h-d) !important; } /* fissa su desktop */
+}
+.day-page .panel-media img{
+  position: absolute;
+  inset: var(--card-frame-pad);
+  width: calc(100% - 2 * var(--card-frame-pad));
+  height: calc(100% - 2 * var(--card-frame-pad));
+  object-fit: cover;
+  object-position: 50% 50%; /* centrata anche in verticale */
+  border-radius: var(--card-frame-radius);
+  display: block;
+}
+/* cornice sottilissima intorno al riquadro immagine */
+.day-page .panel-media::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: calc(var(--card-frame-radius) + var(--card-frame-pad));
+  border: 1px solid rgba(2,6,23,.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
+  pointer-events:none;
+}
+
+/* 4) Occhiello e titolo: occhiello senza fondo, sfondo solo sul titolo */
+.day-page .panel-head{
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 8px 12px;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--edge);
+  background: transparent !important;
+}
+.day-page .panel-head .eyebrow{
+  grid-column: 1 / -1;
+  order: -1;
+  margin: 0 0 6px 0;
+  font-size: .86rem; font-weight: 800; letter-spacing: .02em;
+  text-transform: uppercase; color: #1d4ed8;
+  background: transparent !important;
+}
+.day-page .panel-head .h3{
+  margin: 0; line-height: 1.2;
+  white-space: nowrap; overflow: hidden;
+  display: inline-block;
+  padding: .15rem .5rem; border-radius: 10px;
+  background: var(--paper-2);
+  box-shadow: 0 1px 0 rgba(0,0,0,.04) inset;
+  font-size: clamp(18px, 2.2vw, 26px);
+}

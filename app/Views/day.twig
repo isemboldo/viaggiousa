@@ -1,0 +1,189 @@
+{% extends "layout.twig" %}
+{% block title %}Giorno {{ day.giorno_num }} — {{ day.titolo }}{% endblock %}
+
+{% block content %}
+<section class="day-page">
+
+  {# === HERO FULL-WIDTH (fuori dal container) ========================== #}
+  <div class="day-hero" aria-hidden="true">
+    <img src="{{ day.immagine_copertina ?: (base_url ~ '/assets/images/cover-default.jpg') }}" alt="">
+    <div class="veil"></div>
+  </div>
+
+  <div class="container">
+    {# Meta + Heading #}
+    <header class="day-head">
+      <div class="meta">
+        <span class="badge">Giorno {{ day.giorno_num }}</span>
+        {% if day.data %}<span class="date">{{ day.data }}</span>{% endif %}
+      </div>
+      <h1 class="title">{{ day.titolo }}</h1>
+
+      <div class="toolbar">
+        <div class="left">
+          {% if prev %}
+            <a class="btn subtle" href="{{ base_url }}/giorno/{{ prev }}">← Giorno prec.</a>
+          {% endif %}
+        </div>
+        <div class="center">
+          <button class="btn index" type="button" data-open-index="1">☰ Tutti i giorni</button>
+        </div>
+        <div class="right">
+          {% if next %}
+            <a class="btn subtle" href="{{ base_url }}/giorno/{{ next }}">Giorno succ. →</a>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    {# === SEZIONI ======================================================= #}
+    {% if sections|length > 0 %}
+      <section class="story">
+        {% for s in sections %}
+          <article class="panel{% if loop.index is odd %} alt{% endif %}">
+  <div class="panel-media">
+    {% if s.immagine %}
+      <img src="{{ s.immagine }}" alt="">
+    {% endif %}
+  </div>
+
+  <div class="panel-body">
+    <div class="panel-head">
+      {# Occhiello sopra al titolo #}
+      {% if s.sovratitolo %}
+        <div class="eyebrow">{{ s.sovratitolo }}</div>
+      {% endif %}
+
+      {% if s.titolo %}
+        <h3 class="h3">{{ s.titolo }}</h3>
+      {% endif %}
+
+      <div class="counters" aria-label="Feedback sezione" title="Feedback">
+        <span title="Mi piace">👍 {{ s.likes }}</span>
+        <span title="Non mi piace">👎 {{ s.dislikes }}</span>
+        <span title="Richieste info">ℹ️ {{ s.more_info }}</span>
+      </div>
+    </div>
+
+    {% if s.testo %}
+      <div class="richtext">{{ s.testo|raw }}</div>
+    {% endif %}
+  </div>
+</article>
+
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    {# Prev/Next (ripetizione in fondo) #}
+    <div class="btn-row">
+      {% if prev %}
+        <a class="btn" href="{{ base_url }}/giorno/{{ prev }}">← Giorno precedente</a>
+      {% else %}
+        <span></span>
+      {% endif %}
+      {% if next %}
+        <a class="btn" href="{{ base_url }}/giorno/{{ next }}">Giorno successivo →</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {# === MODAL INDICE “Tutti i giorni” ================================== #}
+  <div class="day-index-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="idxTitle">
+    <div class="day-index" tabindex="-1">
+      <div class="idx-head">
+        <h2 id="idxTitle">Indice del viaggio</h2>
+        <button class="btn close" type="button" data-close-index="1" aria-label="Chiudi">✕</button>
+      </div>
+      <div class="idx-body">
+        {% for gruppo in indice %}
+          <section class="idx-group">
+            <h3 class="idx-part">{{ gruppo.parte_titolo }}</h3>
+            <ul class="idx-list">
+              {% for g in gruppo.giorni %}
+                <li>
+                  <a href="{{ base_url }}/giorno/{{ g.id }}">
+                    Giorno {{ g.giorno_num }} — {{ g.titolo }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </section>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</section>
+
+{# === JS MINIMO per il modal indice (accessibile) ========================== #}
+<script>
+(function(){
+  var openBtn  = document.querySelector('[data-open-index]');
+  var closeBtn = document.querySelector('[data-close-index]');
+  var modal    = document.querySelector('.day-index-backdrop');
+  var panel    = document.querySelector('.day-index');
+  if (!openBtn || !modal || !panel) return;
+
+  function open(){
+    modal.classList.remove('hidden');
+    // metti il focus nel panel per tastiera
+    panel.focus();
+    document.addEventListener('keydown', onKey);
+  }
+  function close(){
+    modal.classList.add('hidden');
+    document.removeEventListener('keydown', onKey);
+    openBtn && openBtn.focus();
+  }
+  function onKey(e){
+    if (e.key === 'Escape') close();
+  }
+
+  openBtn.addEventListener('click', open);
+  (closeBtn || modal).addEventListener('click', function(e){
+    if (e.target === modal || e.target === closeBtn) close();
+  });
+})();
+</script>
+<script>
+(function(){
+  function fitOne(el, minPx, maxPx){
+    // titolo su una sola riga: calcola spazio disponibile nella colonna 1
+    const head = el.closest('.panel-head');
+    if (!head) return;
+    const counters = head.querySelector('.counters');
+    const gap = parseFloat(getComputedStyle(head).columnGap) || 0;
+    const available = head.clientWidth - (counters ? (counters.offsetWidth + gap) : 0);
+
+    let lo = minPx, hi = maxPx, best = minPx;
+    // prova dimensioni con ricerca binaria
+    while (lo <= hi) {
+      const mid = Math.floor((lo + hi) / 2);
+      el.style.fontSize = mid + 'px';
+      // se la larghezza del testo entra nello spazio disponibile, prova più grande
+      if (el.scrollWidth <= available) { best = mid; lo = mid + 1; }
+      else { hi = mid - 1; }
+    }
+    el.style.fontSize = best + 'px';
+  }
+
+  function run(){
+    const rs = getComputedStyle(document.documentElement);
+    const minPx = parseInt(rs.getPropertyValue('--h3-min-px')) || 16;
+    const maxPx = parseInt(rs.getPropertyValue('--h3-max-px')) || 26;
+    document.querySelectorAll('.day-page .panel-head .h3').forEach(el => fitOne(el, minPx, maxPx));
+  }
+
+  // prima passata quando i font sono caricati
+  window.addEventListener('load', run);
+  // ricalcola al resize (throttled)
+  let t; window.addEventListener('resize', ()=>{ clearTimeout(t); t=setTimeout(run, 80); });
+
+  // se dinamicamente cambiano i pannelli, osserva
+  const ro = new ResizeObserver(()=> run());
+  document.querySelectorAll('.day-page .panel-head').forEach(n => ro.observe(n));
+})();
+</script>
+
+{% endblock %}

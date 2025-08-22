@@ -1,0 +1,8 @@
+{% extends "layout.twig" %}
+{% block title %}Pagina non trovata{% endblock %}
+{% block content %}
+  <h1>404</h1>
+  <p>La pagina richiesta non esiste.</p>
+  {% if path %}<p style="color:#6b7280; font-size:0.95rem;">Richiesta: <code>{{ path }}</code></p>{% endif %}
+  <p><a href="{{ base_url }}/">Torna all’itinerario</a></p>
+{% endblock %}
