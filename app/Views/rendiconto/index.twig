@@ -3,7 +3,13 @@
 
 {% block content %}
 <section class="rendiconto-page">
-  <h1 class="page-title">Rendiconto spese</h1>
+  <div class="flex-between" style="display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;">
+    <h1 class="page-title" style="margin:0;">Rendiconto spese</h1>
+    <div style="margin-left:auto; display:flex; gap:.5rem;">
+      <a class="btn subtle" href="{{ base_url }}/rendiconto.json">Esporta JSON</a>
+      <a class="btn subtle" href="{{ base_url }}/rendiconto.csv">Esporta CSV</a>
+    </div>
+  </div>
 
   {% if missing_currencies and missing_currencies|length > 0 %}
     <div class="callout warn">
@@ -14,7 +20,7 @@
     </div>
   {% endif %}
 
-  <div class="cards-3">
+  <div class="cards-3" style="margin-top:.75rem;">
     <div class="card">
       <div class="card-title">Totale stimato</div>
       <div class="card-value">{{ totals.stimato }}</div>
@@ -36,8 +42,15 @@
     </thead>
     <tbody>
       {% for cat, val in by_category %}
+        {% set slug = cat_map[cat]|default(null) %}
         <tr>
-          <td>{{ cat }}</td>
+          <td>
+            {% if slug %}
+              <a href="{{ base_url }}/rendiconto/categoria/{{ slug }}">{{ cat }}</a>
+            {% else %}
+              {{ cat }}
+            {% endif %}
+          </td>
           <td class="ta-r">{{ val }}</td>
         </tr>
       {% else %}
@@ -61,7 +74,9 @@
     <tbody>
       {% for row in participants %}
         <tr>
-          <td>{{ row.name }}</td>
+          <td>
+            <a href="{{ base_url }}/rendiconto/partecipante/{{ row.name_slug }}">{{ row.name }}</a>
+          </td>
           <td class="ta-r">{{ row.dovuto }}</td>
           <td class="ta-r">{{ row.ha_pagato }}</td>
           <td class="ta-r">{{ row.contributi }}</td>

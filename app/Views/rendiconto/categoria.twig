@@ -1,0 +1,55 @@
+{% extends "layout.twig" %}
+{% block title %}Categoria: {{ label }}{% endblock %}
+
+{% block content %}
+<section class="rendiconto-page">
+  <a href="{{ base_url }}/rendiconto" class="btn subtle">← Torna al rendiconto</a>
+  <h1 class="page-title">Categoria: {{ label }}</h1>
+  {% if missing and missing|length > 0 %}
+    <div class="callout warn">
+      Tassi mancanti per: {{ missing|join(', ') }}.
+    </div>
+  {% endif %}
+
+  <div class="cards-3">
+    <div class="card">
+      <div class="card-title">Totale</div>
+      <div class="card-value">{{ total }}</div>
+    </div>
+  </div>
+
+  <h2 class="sec-title">Voci</h2>
+  <table class="table cat">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Descrizione</th>
+        <th class="ta-r">Importo (orig.)</th>
+        <th class="ta-r">CHF</th>
+        <th>Giorno</th>
+        <th>Pagato da</th>
+        <th>Diviso per</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+        <tr>
+          <td>{{ r.data ?: '—' }}</td>
+          <td>{{ r.descrizione }}</td>
+          <td class="ta-r">{{ r.amount }}</td>
+          <td class="ta-r">{{ r.amount_chf }}</td>
+          <td>
+            {% if r.giorno_id %}
+              <a href="{{ base_url }}/giorno/{{ r.giorno_id }}">Giorno {{ r.giorno_id }}</a>
+            {% else %}—{% endif %}
+          </td>
+          <td>{{ r.pagato_da ?: '—' }}</td>
+          <td>{{ r.diviso_per ?: '—' }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7">Nessuna voce in questa categoria.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

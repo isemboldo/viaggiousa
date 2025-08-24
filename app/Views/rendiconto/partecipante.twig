@@ -1,0 +1,66 @@
+{% extends "layout.twig" %}
+{% block title %}Partecipante: {{ name }}{% endblock %}
+
+{% block content %}
+<section class="rendiconto-page">
+  <a href="{{ base_url }}/rendiconto" class="btn subtle">← Torna al rendiconto</a>
+  <h1 class="page-title">Estratto conto: {{ name }}</h1>
+
+  <div class="cards-3">
+    <div class="card"><div class="card-title">Dovuto</div><div class="card-value">{{ tot_dovuti }}</div></div>
+    <div class="card"><div class="card-title">Contributi</div><div class="card-value">{{ tot_contrib }}</div></div>
+    <div class="card">
+      <div class="card-title">Saldo</div>
+      <div class="card-value"><span class="pill {{ _saldo_raw >= 0 ? 'ok' : 'ko' }}">{{ saldo }}</span></div>
+    </div>
+  </div>
+
+  <h2 class="sec-title">Quote dovute</h2>
+  <table class="table">
+    <thead><tr><th>Data</th><th>Descrizione</th><th>Cat.</th><th>Giorno</th><th class="ta-r">Quota (CHF)</th></tr></thead>
+    <tbody>
+      {% for r in dovuti %}
+        <tr>
+          <td>{{ r.data ?: '—' }}</td>
+          <td>{{ r.desc }}</td>
+          <td>{{ r.cat }}</td>
+          <td>{% if r.giorno %}<a href="{{ base_url }}/giorno/{{ r.giorno }}">Giorno {{ r.giorno }}</a>{% else %}—{% endif %}</td>
+          <td class="ta-r">{{ r.importo }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">Nessuna quota trovata.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="sec-title">Contributi versati</h2>
+  <table class="table">
+    <thead><tr><th>Data</th><th class="ta-r">Importo (CHF)</th><th>Note</th></tr></thead>
+    <tbody>
+      {% for p in contrib %}
+        <tr><td>{{ p.data ?: '—' }}</td><td class="ta-r">{{ p.importo }}</td><td>{{ p.nota }}</td></tr>
+      {% else %}
+        <tr><td colspan="3">Nessun contributo registrato.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="sec-title">Spese intestate</h2>
+  <table class="table">
+    <thead><tr><th>Data</th><th>Descrizione</th><th>Cat.</th><th>Giorno</th><th class="ta-r">Importo (CHF)</th></tr></thead>
+    <tbody>
+      {% for r in pagati %}
+        <tr>
+          <td>{{ r.data ?: '—' }}</td>
+          <td>{{ r.desc }}</td>
+          <td>{{ r.cat }}</td>
+          <td>{% if r.giorno %}<a href="{{ base_url }}/giorno/{{ r.giorno }}">Giorno {{ r.giorno }}</a>{% else %}—{% endif %}</td>
+          <td class="ta-r">{{ r.importo }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">Nessuna spesa intestata.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

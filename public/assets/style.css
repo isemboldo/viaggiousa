@@ -1586,3 +1586,4 @@ body.no-header main.container { padding-top: 0 !important; }
 .rendiconto-page .pill{ padding:.1rem .45rem; border-radius:999px; font-weight:800; }
 .rendiconto-page .pill.ok{ background:#ecfdf5; color:#065f46; border:1px solid #10b981; }
 .rendiconto-page .pill.ko{ background:#fef2f2; color:#991b1b; border:1px solid #f87171; }
+.rendiconto-page a.btn.subtle{ background:var(--paper-2); border:1px solid var(--edge); padding:.4rem .7rem; border-radius:8px; display:inline-block; margin-bottom:.5rem; }

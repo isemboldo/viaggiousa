@@ -20,9 +20,11 @@ $router->get('/giorno/{id}', [DayController::class, 'show']);
 $router->get('/sezione/{id}', [SectionController::class, 'show']);
 $router->post('/api/section/{id}/feedback', [\App\Controllers\FeedbackController::class, 'react']);
 $router->get('/rendiconto', [\App\Controllers\RendicontoController::class, 'index']);
-// opzionali (fase successiva):
-$router->get('/rendiconto/categoria/{name}', [\App\Controllers\RendicontoController::class, 'categoria']);
-$router->get('/rendiconto/partecipante/{name}', [\App\Controllers\RendicontoController::class, 'partecipante']);
+$router->get('/rendiconto', [\App\Controllers\RendicontoController::class, 'index']);
+$router->get('/rendiconto/categoria/{slug}', [\App\Controllers\RendicontoController::class, 'categoria']);
+$router->get('/rendiconto/partecipante/{slug}', [\App\Controllers\RendicontoController::class, 'partecipante']);
+$router->get('/rendiconto.json', [\App\Controllers\RendicontoController::class, 'exportJson']);
+$router->get('/rendiconto.csv',  [\App\Controllers\RendicontoController::class, 'exportCsv']);
 
 $router->get('/rendiconto/_debug', function(){
     header('Content-Type: application/json; charset=utf-8');
