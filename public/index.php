@@ -25,17 +25,9 @@ $router->get('/rendiconto/categoria/{slug}', [\App\Controllers\RendicontoControl
 $router->get('/rendiconto/partecipante/{slug}', [\App\Controllers\RendicontoController::class, 'partecipante']);
 $router->get('/rendiconto.json', [\App\Controllers\RendicontoController::class, 'exportJson']);
 $router->get('/rendiconto.csv',  [\App\Controllers\RendicontoController::class, 'exportCsv']);
+$router->get('/rendiconto/categoria/{slug}.csv', [\App\Controllers\RendicontoController::class, 'exportCategoriaCsv']);
+$router->get('/rendiconto/partecipante/{slug}.csv', [\App\Controllers\RendicontoController::class, 'exportPartecipanteCsv']);
 
-$router->get('/rendiconto/_debug', function(){
-    header('Content-Type: application/json; charset=utf-8');
-    $exp = new \App\Models\Expense(\DB::pdo(), new \App\Models\Fx(\DB::pdo()));
-    $pay = new \App\Models\Payment(\DB::pdo(), new \App\Models\Fx(\DB::pdo()));
-    echo json_encode([
-        'sample_expenses' => array_slice($exp->all(), 0, 5),
-        'payments'        => $pay->all(),
-        'fx_known'        => (new \App\Models\Fx(\DB::pdo()))->knownCodes(),
-    ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
-});
 
 
 /**

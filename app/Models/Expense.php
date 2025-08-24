@@ -26,7 +26,7 @@ final class Expense
 
         $result = [];
         foreach ($rows as $r) {
-            $val = strtoupper((string)($r['valuta'] ?? 'CHF'));
+            $val = \App\Models\Fx::normalizeCode($r['valuta'] ?? 'CHF');
             $rate = $this->fx->rateToChf($val);
 
             $st = (float)$r['importo_stimato'];

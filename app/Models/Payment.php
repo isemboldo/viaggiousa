@@ -33,7 +33,7 @@ final class Payment
         foreach ($rows as $r) {
             $name = \App\Models\Expense::normalizeName((string)$r['partecipante']);
             $amount = (float)$r['importo'];
-            $val = strtoupper((string)$r['valuta'] ?: 'CHF');
+            $val = \App\Models\Fx::normalizeCode($r['valuta'] ?? 'CHF');
             $rate = $this->fx->rateToChf($val);
             $chf = $rate > 0 ? $amount * $rate : null;
 

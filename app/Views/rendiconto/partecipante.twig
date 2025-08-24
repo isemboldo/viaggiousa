@@ -3,7 +3,11 @@
 
 {% block content %}
 <section class="rendiconto-page">
+  <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin:.5rem 0 1rem;">
   <a href="{{ base_url }}/rendiconto" class="btn subtle">← Torna al rendiconto</a>
+  <a class="btn subtle" href="{{ base_url }}/rendiconto/partecipante/{{ name|lower|replace({' ':'-'}) }}.csv?locale=en">Esporta CSV</a>
+  <button type="button" class="btn subtle" id="copy-link">Copia link</button>
+</div>
   <h1 class="page-title">Estratto conto: {{ name }}</h1>
 
   <div class="cards-3">
@@ -63,4 +67,23 @@
     </tbody>
   </table>
 </section>
+<script>
+(function(){
+  const btn = document.getElementById('copy-link');
+  if (!btn) return;
+  btn.addEventListener('click', async ()=>{
+    const url = window.location.href;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url; ta.style.position='fixed'; ta.style.left='-9999px';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      }
+      const old = btn.textContent; btn.textContent='Copiato ✓'; setTimeout(()=>btn.textContent=old,1500);
+    } catch(e){ alert('Non riesco a copiare il link: '+e); }
+  });
+})();
+</script>
 {% endblock %}

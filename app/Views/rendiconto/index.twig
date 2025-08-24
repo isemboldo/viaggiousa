@@ -5,10 +5,11 @@
 <section class="rendiconto-page">
   <div class="flex-between" style="display:flex; align-items:end; gap:.75rem; flex-wrap:wrap;">
     <h1 class="page-title" style="margin:0;">Rendiconto spese</h1>
-    <div style="margin-left:auto; display:flex; gap:.5rem;">
-      <a class="btn subtle" href="{{ base_url }}/rendiconto.json">Esporta JSON</a>
-      <a class="btn subtle" href="{{ base_url }}/rendiconto.csv">Esporta CSV</a>
-    </div>
+    <div style="margin-left:auto; display:flex; gap:.5rem; flex-wrap:wrap;">
+  <button type="button" class="btn subtle" id="copy-link">Copia link con filtri</button>
+  <a class="btn subtle" href="{{ base_url }}/rendiconto.json">Esporta JSON</a>
+  <a class="btn subtle" href="{{ base_url }}/rendiconto.csv?locale=en">Esporta CSV</a>
+</div>
   </div>
 
   <form method="get" action="{{ base_url }}/rendiconto" class="filters" style="margin:.8rem 0 1rem; display:grid; gap:.5rem; grid-template-columns:1fr;">
@@ -178,4 +179,30 @@
   });
 })();
 </script>
+<script>
+(function(){
+  const btn = document.getElementById('copy-link');
+  if (!btn) return;
+  btn.addEventListener('click', async ()=>{
+    const url = window.location.href;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      }
+      const old = btn.textContent;
+      btn.textContent = 'Copiato ✓';
+      setTimeout(()=>{ btn.textContent = old; }, 1500);
+    } catch (e) {
+      alert('Non riesco a copiare il link: ' + e);
+    }
+  });
+})();
+</script>
+
 {% endblock %}

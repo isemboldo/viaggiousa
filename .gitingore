@@ -59,3 +59,7 @@ yarn-error.log*
 
 # --- File di deploy locali (opzionali) ---
 /.ftpconfig
+
+/storage/cache/
+/storage/logs/
+
