@@ -1,0 +1,78 @@
+{% extends "layout.twig" %}
+{% block title %}Rendiconto spese{% endblock %}
+
+{% block content %}
+<section class="rendiconto-page">
+  <h1 class="page-title">Rendiconto spese</h1>
+
+  {% if missing_currencies and missing_currencies|length > 0 %}
+    <div class="callout warn">
+      <strong>Tassi mancanti:</strong>
+      Le seguenti valute non hanno un tasso di conversione verso CHF:
+      <em>{{ missing_currencies|join(', ') }}</em>.
+      Le voci relative potrebbero non essere incluse nei totali.
+    </div>
+  {% endif %}
+
+  <div class="cards-3">
+    <div class="card">
+      <div class="card-title">Totale stimato</div>
+      <div class="card-value">{{ totals.stimato }}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Totale preventivo</div>
+      <div class="card-value">{{ totals.preventivo }}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Totale reale</div>
+      <div class="card-value">{{ totals.reale }}</div>
+    </div>
+  </div>
+
+  <h2 class="sec-title">Per categoria</h2>
+  <table class="table cat">
+    <thead>
+      <tr><th>Categoria</th><th class="ta-r">Totale</th></tr>
+    </thead>
+    <tbody>
+      {% for cat, val in by_category %}
+        <tr>
+          <td>{{ cat }}</td>
+          <td class="ta-r">{{ val }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="2">Nessuna spesa trovata.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="sec-title">Per partecipante</h2>
+  <div class="note">Le spese non ripartite non entrano nel prospetto personale. Totale non ripartito: <strong>{{ unassigned_fmt }}</strong>.</div>
+  <table class="table people">
+    <thead>
+      <tr>
+        <th>Partecipante</th>
+        <th class="ta-r">Dovuto</th>
+        <th class="ta-r">Ha pagato</th>
+        <th class="ta-r">Contributi</th>
+        <th class="ta-r">Saldo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in participants %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td class="ta-r">{{ row.dovuto }}</td>
+          <td class="ta-r">{{ row.ha_pagato }}</td>
+          <td class="ta-r">{{ row.contributi }}</td>
+          <td class="ta-r">
+            <span class="pill {{ row._saldo_raw >= 0 ? 'ok' : 'ko' }}">{{ row.saldo }}</span>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">Nessun partecipante rilevato.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

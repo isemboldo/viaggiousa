@@ -19,7 +19,21 @@ $router->get('/', [HomeController::class, 'index']);
 $router->get('/giorno/{id}', [DayController::class, 'show']);
 $router->get('/sezione/{id}', [SectionController::class, 'show']);
 $router->post('/api/section/{id}/feedback', [\App\Controllers\FeedbackController::class, 'react']);
+$router->get('/rendiconto', [\App\Controllers\RendicontoController::class, 'index']);
+// opzionali (fase successiva):
+$router->get('/rendiconto/categoria/{name}', [\App\Controllers\RendicontoController::class, 'categoria']);
+$router->get('/rendiconto/partecipante/{name}', [\App\Controllers\RendicontoController::class, 'partecipante']);
 
+$router->get('/rendiconto/_debug', function(){
+    header('Content-Type: application/json; charset=utf-8');
+    $exp = new \App\Models\Expense(\DB::pdo(), new \App\Models\Fx(\DB::pdo()));
+    $pay = new \App\Models\Payment(\DB::pdo(), new \App\Models\Fx(\DB::pdo()));
+    echo json_encode([
+        'sample_expenses' => array_slice($exp->all(), 0, 5),
+        'payments'        => $pay->all(),
+        'fx_known'        => (new \App\Models\Fx(\DB::pdo()))->knownCodes(),
+    ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+});
 
 
 /**

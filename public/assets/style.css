@@ -1370,7 +1370,9 @@ body.no-header main.container { padding-top: 0 !important; }
 @media (min-width: 900px){
   .day-page .panel{
     display: grid;
-    grid-te
+    /* Add your intended grid-template or remove this block if not needed */
+  }
+}
 /* ===== GIORNO — FIX MINIMO E MIRATO ===== */
 
 /* 1) HERO full-bleed robusto (anche se annidato in container) */
@@ -1555,5 +1557,32 @@ body.no-header main.container { padding-top: 0 !important; }
   transition: opacity .2s ease, transform .2s ease;
 }
 #vu-toast .toast.show{
-  opacity: 1; transform: translateY(0);
+  opacity: 1; 
+  transform: translateY(0);
 }
+/* ===== Rendiconto (solo .rendiconto-page) ===== */
+.rendiconto-page .page-title{ font-size: clamp(24px, 4vw, 40px); margin: .25rem 0 1rem; }
+.rendiconto-page .sec-title{ font-size: clamp(18px, 2.5vw, 26px); margin: 1.25rem 0 .5rem; }
+.rendiconto-page .note{ color: var(--muted); margin-bottom: .5rem; }
+
+.rendiconto-page .callout.warn{
+  background: #fff7ed; border:1px solid #fed7aa; color:#9a3412;
+  padding: .75rem 1rem; border-radius: 10px; margin: .5rem 0 1rem;
+}
+
+.rendiconto-page .cards-3{ display:grid; gap:12px; grid-template-columns: 1fr; }
+@media (min-width: 800px){ .rendiconto-page .cards-3{ grid-template-columns: repeat(3, 1fr); } }
+.rendiconto-page .card{
+  background:#fff; border:1px solid var(--edge); border-radius:12px; padding: .9rem 1rem;
+  box-shadow: var(--shadow-s, 0 1px 3px rgba(0,0,0,.06));
+}
+.rendiconto-page .card-title{ font-weight:700; color:var(--muted); margin-bottom:.2rem; }
+.rendiconto-page .card-value{ font-weight:800; font-size: clamp(20px, 3vw, 32px); }
+
+.rendiconto-page .table{ width:100%; border-collapse: collapse; background:#fff; border:1px solid var(--edge); border-radius:12px; overflow:hidden; }
+.rendiconto-page .table thead th{ background:#f3f4f6; text-align:left; padding:.55rem .6rem; font-weight:800; }
+.rendiconto-page .table tbody td{ border-top:1px solid var(--edge); padding:.55rem .6rem; }
+.rendiconto-page .table .ta-r{ text-align:right; }
+.rendiconto-page .pill{ padding:.1rem .45rem; border-radius:999px; font-weight:800; }
+.rendiconto-page .pill.ok{ background:#ecfdf5; color:#065f46; border:1px solid #10b981; }
+.rendiconto-page .pill.ko{ background:#fef2f2; color:#991b1b; border:1px solid #f87171; }
