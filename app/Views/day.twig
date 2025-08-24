@@ -213,12 +213,31 @@
 </script>
 <script>
 (function(){
+  // --- mini toast non-invasivo ---
+  function toast(msg){
+    let c = document.getElementById('vu-toast');
+    if(!c){
+      c = document.createElement('div');
+      c.id = 'vu-toast';
+      c.setAttribute('aria-live','polite');
+      document.body.appendChild(c);
+    }
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    c.appendChild(t);
+    requestAnimationFrame(()=> t.classList.add('show'));
+    setTimeout(()=> {
+      t.classList.remove('show');
+      setTimeout(()=> t.remove(), 250);
+    }, 2200);
+  }
+
   function markGroup(btn){
     const group = btn.closest('.counters');
     if (!group) return;
-    const act = btn.dataset.action;
     // opzionale: mutua esclusione like/dislike lato client
-    if (act === 'like' || act === 'dislike') {
+    if (btn.dataset.action === 'like' || btn.dataset.action === 'dislike') {
       group.querySelectorAll('[data-action="like"],[data-action="dislike"]').forEach(b=>{
         b.classList.add('done');
         b.setAttribute('disabled','disabled');
@@ -230,41 +249,58 @@
 
   async function ajaxSubmit(form){
     const btn = form.querySelector('.fb-btn');
+    if(!btn) return;
     const formData = new FormData(form);
-    const id = btn.dataset.section;
     const url = form.getAttribute('action');
 
     try{
       const resp = await fetch(url, {
         method: 'POST',
-        credentials: 'same-origin', // << invia cookie/sessione
+        credentials: 'same-origin',           // invia cookie/sessione
         headers: {'Accept':'application/json'},
         body: new URLSearchParams(formData)
       });
-      const text = await resp.text();
-      let data = {};
-      try { data = JSON.parse(text); } catch(e){ /* non JSON → fallback */ }
 
-      if (!resp.ok || !data.ok) {
-        // Fallback: se AJAX non va, lascia che il form proceda (submit normale)
-        form.submit();
+      // Proviamo a leggere JSON; se non è JSON, trattiamo come errore “soft”
+      let data = null;
+      try { data = await resp.json(); } catch { data = null; }
+
+      if (resp.ok && data && data.ok){
+        // successo: aggiorna contatori e disabilita
+        const root = form.closest('.counters');
+        if (root && data.counts){
+          const L = root.querySelector('.fb-like');
+          const D = root.querySelector('.fb-dislike');
+          const I = root.querySelector('.fb-info');
+          if (L) L.textContent = data.counts.likes;
+          if (D) D.textContent = data.counts.dislikes;
+          if (I) I.textContent = data.counts.more_info;
+        }
+        markGroup(btn);
+        toast('Grazie per il feedback!');
         return;
       }
 
-      // Ok: aggiorna contatori e disabilita bottoni
-      const root = form.closest('.counters');
-      if (root){
-        root.querySelector('.fb-like').textContent    = data.counts.likes;
-        root.querySelector('.fb-dislike').textContent = data.counts.dislikes;
-        root.querySelector('.fb-info').textContent    = data.counts.more_info;
+      // Gestione “user friendly” degli errori comuni
+      if (resp.status === 409){         // Already recorded
+        markGroup(btn);                 // disabilita come se fosse già cliccato
+        toast('Hai già registrato il tuo feedback per questa sezione.');
+        return;
       }
-      markGroup(btn);
+      if (resp.status === 419){         // CSRF / sessione
+        toast('Sessione scaduta. Ricarica la pagina e riprova.');
+        return;
+      }
+
+      // altri errori: non aprire il JSON, avvisa soltanto
+      toast('Ops, errore temporaneo. Riprova più tardi.');
     }catch(e){
-      // Fallback anche su eccezioni
-      form.submit();
+      // errore di rete: non aprire JSON
+      toast('Connessione assente: riprova.');
     }
   }
 
+  // Intercetta il submit dei tre form e impedisce navigazione
   document.addEventListener('submit', function(e){
     const form = e.target.closest('.fb-form');
     if (!form) return;
@@ -273,6 +309,4 @@
   }, false);
 })();
 </script>
-
-
 {% endblock %}

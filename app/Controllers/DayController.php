@@ -28,7 +28,7 @@ final class DayController extends BaseController
         ");
         $st->execute([':id' => $dayId]);
         $day = $st->fetch(\PDO::FETCH_ASSOC);
-
+$fbCookie = $this->readFeedbackCookie(); // array tipo [ "s12" => ["like"=>true,...], ... ]
         if (!$day) {
             http_response_code(404);
             $this->view('errors/404.twig', ['path' => '/giorno/' . $dayId]);
@@ -208,4 +208,17 @@ $csrf = Csrf::token();
             'samesite' => 'Lax',
         ]);
     }
+    private function readFeedbackCookie(): array {
+    $cookie = $_COOKIE['vu_fb'] ?? '';
+    if (!$cookie) return [];
+    $parts = explode('.', $cookie, 2);
+    if (count($parts) !== 2) return [];
+    [$payload, $sig] = $parts;
+    $key = $_ENV['APP_KEY'] ?? $_ENV['APP_SECRET'] ?? 'temp-key-change-me';
+    $calc = hash_hmac('sha256', $payload, $key);
+    if (!hash_equals($calc, $sig)) return [];
+    $data = json_decode(base64_decode($payload) ?: '[]', true);
+    return is_array($data) ? $data : [];
+}
+
 }

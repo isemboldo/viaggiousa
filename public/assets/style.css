@@ -1541,3 +1541,19 @@ body.no-header main.container { padding-top: 0 !important; }
 }
 .day-page .counters .fb-btn.done,
 .day-page .counters .fb-btn[disabled]{ opacity:.55; cursor:default; }
+/* Toast */
+#vu-toast{
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 8px;
+  z-index: 9999; pointer-events: none;
+}
+#vu-toast .toast{
+  background: rgba(17,24,39,.95); color: #fff; border-radius: 10px;
+  padding: .55rem .8rem; font-weight: 600; letter-spacing: .01em;
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+#vu-toast .toast.show{
+  opacity: 1; transform: translateY(0);
+}
