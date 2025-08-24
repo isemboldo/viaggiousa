@@ -20,47 +20,100 @@ final class RendicontoController extends BaseController
     }
 
     public function index(): void
-    {
-        $svc    = $this->service();
-        $totals = $svc->totals();
-        $cats   = $svc->byCategory();
-        $parts  = $svc->participants();
+{
+    $svc    = $this->service();
 
-        $fmt = fn(float $v): string => 'CHF ' . number_format($v, 2, ',', '’');
+    // --- Lettura filtri da querystring ---
+    $from = $_GET['from'] ?? null;
+    $to   = $_GET['to']   ?? null;
+    $cur  = strtoupper(trim($_GET['cur'] ?? '')); // '' = tutte
+    $catSlug = $_GET['cat'] ?? '';
 
-        $totalsFmt = array_map($fmt, $totals['values']);
-        $catsFmt   = [];
-        foreach ($cats['values'] as $k => $v) { $catsFmt[$k] = $fmt((float)$v); }
+    // sanifica date (YYYY-MM-DD)
+    $isDate = fn($s) => is_string($s) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $s);
+    $from = $isDate($from) ? $from : null;
+    $to   = $isDate($to)   ? $to   : null;
 
-        $participants = [];
-        foreach ($parts['rows'] as $name => $row) {
-            $participants[] = [
-                'name'        => $name,
-                'name_slug'   => \App\Services\BudgetService::slugify($name),
-                'dovuto'      => $fmt($row['dovuto']),
-                'ha_pagato'   => $fmt($row['ha_pagato']),
-                'contributi'  => $fmt($row['contributi']),
-                'saldo'       => $fmt($row['saldo']),
-                '_saldo_raw'  => $row['saldo'],
-            ];
-        }
- $catIndex = $svc->categoriesIndex(); // ['slug_to_label'=>..., 'label_to_slug'=>...]
-        $this->view('rendiconto/index.twig', [
-            'title'   => 'Rendiconto spese',
-            'meta'    => [
-                'title'       => 'Rendiconto spese',
-                'description' => 'Totali, categorie e saldi per partecipante.',
-                'url'         => ($_ENV['APP_URL_BASE'] ?? '') . '/rendiconto',
-            ],
-            'totals'  => $totalsFmt,
-            'missing_currencies' => $totals['missing'] ?: $cats['missing'] ?? [],
-            'by_category' => $catsFmt,
-            'participants' => $participants,
-            'unassigned_fmt' => $fmt($parts['unassigned']),
-            'cat_index' => $catIndex['slug_to_label'],      // slug => label (se serve altrove)
-            'cat_map'   => $catIndex['label_to_slug'],      // label => slug  (usata in twig sotto)
-        ]);
+    // mappa categorie
+    $catIndex = $svc->categoriesIndex(); // ['slug_to_label'=>..., 'label_to_slug'=>...]
+    $catLabel = $catSlug && isset($catIndex['slug_to_label'][$catSlug])
+        ? $catIndex['slug_to_label'][$catSlug]
+        : null;
+
+    // codici valuta disponibili
+    $fxCodes = (new \App\Models\Fx(\DB::pdo()))->knownCodes();
+
+    // filtro che applichiamo a tutti i calcoli
+    $filter = [
+        'from'       => $from,
+        'to'         => $to,
+        'currency'   => ($cur && in_array($cur, $fxCodes, true)) ? $cur : null,
+        'categories' => $catLabel ? [$catLabel] : [], // opzionale
+    ];
+
+    // --- Calcoli ---
+    $totals = $svc->totals($filter);
+    $cats   = $svc->byCategory($filter);
+    $parts  = $svc->participants($filter);
+
+    $fmt = fn(float $v): string => 'CHF ' . number_format($v, 2, ',', '’');
+
+    // categorie: sia formattato che “raw” per sort client
+    $catsFmt = [];
+    foreach ($cats['values'] as $k => $v) { $catsFmt[$k] = $fmt((float)$v); }
+
+    // totali (3 card)
+    $totalsFmt = [
+        'stimato'    => $fmt((float)$totals['values']['stimato']),
+        'preventivo' => $fmt((float)$totals['values']['preventivo']),
+        'reale'      => $fmt((float)$totals['values']['reale']),
+    ];
+
+    // partecipanti: includo raw per sort client
+    $participants = [];
+    foreach ($parts['rows'] as $name => $row) {
+        $participants[] = [
+            'name'            => $name,
+            'name_slug'       => \App\Services\BudgetService::slugify($name),
+            'dovuto'          => $fmt((float)$row['dovuto']),
+            'ha_pagato'       => $fmt((float)$row['ha_pagato']),
+            'contributi'      => $fmt((float)$row['contributi']),
+            'saldo'           => $fmt((float)$row['saldo']),
+            '_saldo_raw'      => (float)$row['saldo'],
+            'dovuto_raw'      => (float)$row['dovuto'],
+            'ha_pagato_raw'   => (float)$row['ha_pagato'],
+            'contributi_raw'  => (float)$row['contributi'],
+        ];
     }
+
+    $this->view('rendiconto/index.twig', [
+        'title'   => 'Rendiconto spese',
+        'meta'    => [
+            'title'       => 'Rendiconto spese',
+            'description' => 'Totali, categorie e saldi per partecipante.',
+            'url'         => ($_ENV['APP_URL_BASE'] ?? '') . '/rendiconto',
+        ],
+
+        // dati
+        'totals'            => $totalsFmt,
+        'by_category'       => $catsFmt,
+        'by_category_raw'   => $cats['values'], // numerici per sort
+        'participants'      => $participants,
+
+        // filtri & sorgenti per form
+        'fx_codes'          => $fxCodes,
+        'cat_index'         => $catIndex['slug_to_label'], // slug => label
+        'cat_map'           => $catIndex['label_to_slug'], // label => slug
+        'filter'            => [
+            'from' => $from, 'to' => $to, 'cur' => $cur, 'cat' => $catSlug
+        ],
+
+        // diagnostica/messaggi
+        'missing_currencies'=> $totals['missing'] ?: $cats['missing'] ?? [],
+        'unassigned_fmt'    => $fmt((float)$parts['unassigned']),
+    ]);
+}
+
 
     public function categoria(string $slug): void
     {

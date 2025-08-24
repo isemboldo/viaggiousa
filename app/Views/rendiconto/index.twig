@@ -3,13 +3,53 @@
 
 {% block content %}
 <section class="rendiconto-page">
-  <div class="flex-between" style="display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;">
+  <div class="flex-between" style="display:flex; align-items:end; gap:.75rem; flex-wrap:wrap;">
     <h1 class="page-title" style="margin:0;">Rendiconto spese</h1>
     <div style="margin-left:auto; display:flex; gap:.5rem;">
       <a class="btn subtle" href="{{ base_url }}/rendiconto.json">Esporta JSON</a>
       <a class="btn subtle" href="{{ base_url }}/rendiconto.csv">Esporta CSV</a>
     </div>
   </div>
+
+  {# --- Filtri rapidi --- #}
+  <form method="get" action="{{ base_url }}/rendiconto" class="filters" style="margin:.8rem 0 1rem; display:grid; gap:.5rem; grid-template-columns:1fr;">
+    <div style="display:grid; gap:.5rem; grid-template-columns: repeat(2, 1fr);">
+      <label style="display:flex; flex-direction:column; gap:.25rem;">
+        <span>Da</span>
+        <input type="date" name="from" value="{{ filter.from|default('') }}">
+      </label>
+      <label style="display:flex; flex-direction:column; gap:.25rem;">
+        <span>A</span>
+        <input type="date" name="to" value="{{ filter.to|default('') }}">
+      </label>
+    </div>
+
+    <div style="display:grid; gap:.5rem; grid-template-columns: repeat(2, 1fr);">
+      <label style="display:flex; flex-direction:column; gap:.25rem;">
+        <span>Valuta</span>
+        <select name="cur">
+          <option value="">Tutte</option>
+          {% for c in fx_codes %}
+            <option value="{{ c }}" {{ filter.cur == c ? 'selected' : '' }}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label style="display:flex; flex-direction:column; gap:.25rem;">
+        <span>Categoria</span>
+        <select name="cat">
+          <option value="">Tutte</option>
+          {% for slug, label in cat_index %}
+            <option value="{{ slug }}" {{ filter.cat == slug ? 'selected' : '' }}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div style="display:flex; gap:.5rem;">
+      <button class="btn">Applica</button>
+      <a class="btn subtle" href="{{ base_url }}/rendiconto">Pulisci</a>
+    </div>
+  </form>
 
   {% if missing_currencies and missing_currencies|length > 0 %}
     <div class="callout warn">
@@ -36,22 +76,25 @@
   </div>
 
   <h2 class="sec-title">Per categoria</h2>
-  <table class="table cat">
+  <table class="table cat vu-sort" data-sort="none">
     <thead>
-      <tr><th>Categoria</th><th class="ta-r">Totale</th></tr>
+      <tr>
+        <th data-type="text"  class="sortable">Categoria</th>
+        <th data-type="num"   class="ta-r sortable">Totale</th>
+      </tr>
     </thead>
     <tbody>
       {% for cat, val in by_category %}
         {% set slug = cat_map[cat]|default(null) %}
         <tr>
-          <td>
+          <td data-raw="{{ cat|lower }}">
             {% if slug %}
               <a href="{{ base_url }}/rendiconto/categoria/{{ slug }}">{{ cat }}</a>
             {% else %}
               {{ cat }}
             {% endif %}
           </td>
-          <td class="ta-r">{{ val }}</td>
+          <td class="ta-r" data-raw="{{ by_category_raw[cat]|default(0) }}">{{ val }}</td>
         </tr>
       {% else %}
         <tr><td colspan="2">Nessuna spesa trovata.</td></tr>
@@ -61,28 +104,24 @@
 
   <h2 class="sec-title">Per partecipante</h2>
   <div class="note">Le spese non ripartite non entrano nel prospetto personale. Totale non ripartito: <strong>{{ unassigned_fmt }}</strong>.</div>
-  <table class="table people">
+  <table class="table people vu-sort" data-sort="none">
     <thead>
       <tr>
-        <th>Partecipante</th>
-        <th class="ta-r">Dovuto</th>
-        <th class="ta-r">Ha pagato</th>
-        <th class="ta-r">Contributi</th>
-        <th class="ta-r">Saldo</th>
+        <th data-type="text" class="sortable">Partecipante</th>
+        <th data-type="num"  class="ta-r sortable">Dovuto</th>
+        <th data-type="num"  class="ta-r sortable">Ha pagato</th>
+        <th data-type="num"  class="ta-r sortable">Contributi</th>
+        <th data-type="num"  class="ta-r sortable">Saldo</th>
       </tr>
     </thead>
     <tbody>
       {% for row in participants %}
         <tr>
-          <td>
-            <a href="{{ base_url }}/rendiconto/partecipante/{{ row.name_slug }}">{{ row.name }}</a>
-          </td>
-          <td class="ta-r">{{ row.dovuto }}</td>
-          <td class="ta-r">{{ row.ha_pagato }}</td>
-          <td class="ta-r">{{ row.contributi }}</td>
-          <td class="ta-r">
-            <span class="pill {{ row._saldo_raw >= 0 ? 'ok' : 'ko' }}">{{ row.saldo }}</span>
-          </td>
+          <td data-raw="{{ row.name|lower }}"><a href="{{ base_url }}/rendiconto/partecipante/{{ row.name_slug }}">{{ row.name }}</a></td>
+          <td class="ta-r" data-raw="{{ row.dovuto_raw }}">{{ row.dovuto }}</td>
+          <td class="ta-r" data-raw="{{ row.ha_pagato_raw }}">{{ row.ha_pagato }}</td>
+          <td class="ta-r" data-raw="{{ row.contributi_raw }}">{{ row.contributi }}</td>
+          <td class="ta-r" data-raw="{{ row._saldo_raw }}"><span class="pill {{ row._saldo_raw >= 0 ? 'ok' : 'ko' }}">{{ row.saldo }}</span></td>
         </tr>
       {% else %}
         <tr><td colspan="5">Nessun partecipante rilevato.</td></tr>
@@ -90,4 +129,40 @@
     </tbody>
   </table>
 </section>
+
+{# --- JS: ordinamento client-side --- #}
+<script>
+(function(){
+  function sortTable(table, colIndex, type, dir){
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+    rows.sort((a,b)=>{
+      const av = a.cells[colIndex].getAttribute('data-raw') ?? a.cells[colIndex].textContent.trim();
+      const bv = b.cells[colIndex].getAttribute('data-raw') ?? b.cells[colIndex].textContent.trim();
+      if (type === 'num'){
+        const an = parseFloat(av.replace(/[^\d.-]/g,'')) || 0;
+        const bn = parseFloat(bv.replace(/[^\d.-]/g,'')) || 0;
+        return dir==='asc' ? an - bn : bn - an;
+      } else {
+        return dir==='asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+      }
+    });
+    rows.forEach(r=>tbody.appendChild(r));
+    table.dataset.sort = colIndex + ':' + dir;
+  }
+
+  document.querySelectorAll('table.vu-sort').forEach(table=>{
+    table.querySelectorAll('th.sortable').forEach((th, idx)=>{
+      th.style.cursor = 'pointer';
+      th.addEventListener('click', ()=>{
+        const type = th.dataset.type || 'text';
+        const prev = table.dataset.sort || 'none';
+        const [pCol, pDir] = prev.includes(':') ? prev.split(':') : ['-1','asc'];
+        const dir = (pCol == idx && pDir === 'asc') ? 'desc' : 'asc';
+        sortTable(table, idx, type, dir);
+      });
+    });
+  });
+})();
+</script>
 {% endblock %}

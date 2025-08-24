@@ -15,9 +15,32 @@ final class BudgetService
         private Fx $fx
     ) {}
 
-    public function totals(): array
-    {
-        $rows = $this->expense->all();
+    private function applyFilter(array $rows, array $filter): array
+{
+    $from = $filter['from'] ?? null;
+    $to   = $filter['to']   ?? null;
+    $cur  = $filter['currency'] ?? null;
+    $cats = $filter['categories'] ?? [];
+
+    return array_values(array_filter($rows, function($r) use($from,$to,$cur,$cats){
+        // data
+        if ($from && (!isset($r['data_spesa']) || $r['data_spesa'] < $from)) return false;
+        if ($to   && (!isset($r['data_spesa']) || $r['data_spesa'] > $to))   return false;
+        // valuta
+        if ($cur && strtoupper($r['valuta'] ?? '') !== $cur) return false;
+        // categorie (label esatta)
+        if ($cats && !in_array($r['categoria'] ?: 'Varie', $cats, true)) return false;
+        return true;
+    }));
+}
+
+
+
+
+    public function totals(array $filter = []): array
+{
+    $rows = $this->expense->all();
+    $rows = $this->applyFilter($rows, $filter);
         $missing = [];
 
         $sum = [
@@ -42,9 +65,10 @@ final class BudgetService
         ];
     }
 
-    public function byCategory(): array
-    {
-        $rows = $this->expense->all();
+    public function byCategory(array $filter = []): array
+{
+    $rows = $this->expense->all();
+    $rows = $this->applyFilter($rows, $filter);
         $out = [];
         $missing = [];
 
@@ -65,9 +89,10 @@ final class BudgetService
         return ['values' => $out, 'missing' => array_keys($missing)];
     }
 
-    public function participants(): array
-    {
-        $rows = $this->expense->all();
+    public function participants(array $filter = []): array
+{
+    $rows = $this->expense->all();
+    $rows = $this->applyFilter($rows, $filter);
         $contrib = $this->payment->sumByParticipant();
 
         $names = [];
