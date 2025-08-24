@@ -5,9 +5,35 @@
 <section class="rendiconto-page">
   <a href="{{ base_url }}/rendiconto" class="btn subtle">← Torna al rendiconto</a>
   <h1 class="page-title">Categoria: {{ label }}</h1>
+
   {% if missing and missing|length > 0 %}
     <div class="callout warn">
       Tassi mancanti per: {{ missing|join(', ') }}.
+    </div>
+  {% endif %}
+
+  {% if missing_rows and missing_rows|length > 0 %}
+    <div class="callout warn" style="margin-bottom:1rem;">
+      <strong>Da verificare ({{ label }}):</strong> voci senza tasso (prime 10).
+      <table class="table" style="margin-top:.5rem;">
+        <thead><tr>
+          <th>Data</th><th>Descrizione</th><th>Valuta</th><th class="ta-r">Importo (orig.)</th><th>Giorno</th>
+        </tr></thead>
+        <tbody>
+          {% for r in missing_rows|slice(0,10) %}
+            <tr>
+              <td>{{ r.data ?: '—' }}</td>
+              <td>{{ r.descrizione }}</td>
+              <td>{{ r.valuta }}</td>
+              <td class="ta-r">{{ r.amount }}</td>
+              <td>{% if r.giorno_id %}<a href="{{ base_url }}/giorno/{{ r.giorno_id }}">Giorno {{ r.giorno_id }}</a>{% else %}—{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if missing_rows|length > 10 %}
+        <div class="note">…e altre {{ missing_rows|length - 10 }} voci.</div>
+      {% endif %}
     </div>
   {% endif %}
 

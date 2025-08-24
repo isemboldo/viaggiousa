@@ -11,7 +11,6 @@
     </div>
   </div>
 
-  {# --- Filtri rapidi --- #}
   <form method="get" action="{{ base_url }}/rendiconto" class="filters" style="margin:.8rem 0 1rem; display:grid; gap:.5rem; grid-template-columns:1fr;">
     <div style="display:grid; gap:.5rem; grid-template-columns: repeat(2, 1fr);">
       <label style="display:flex; flex-direction:column; gap:.25rem;">
@@ -56,23 +55,40 @@
       <strong>Tassi mancanti:</strong>
       Le seguenti valute non hanno un tasso di conversione verso CHF:
       <em>{{ missing_currencies|join(', ') }}</em>.
-      Le voci relative potrebbero non essere incluse nei totali.
     </div>
   {% endif %}
 
+  {# --- Da verificare: righe senza tasso --- #}
+  {% if missing_rows and missing_rows|length > 0 %}
+  <div class="callout warn" style="margin-bottom:1rem;">
+    <strong>Da verificare:</strong> voci senza tasso di cambio (prime 10).
+    <table class="table" style="margin-top:.5rem;">
+      <thead><tr>
+        <th>Data</th><th>Descrizione</th><th>Categoria</th><th>Valuta</th><th class="ta-r">Importo (orig.)</th><th>Giorno</th>
+      </tr></thead>
+      <tbody>
+        {% for r in missing_rows|slice(0,10) %}
+        <tr>
+          <td>{{ r.data ?: '—' }}</td>
+          <td>{{ r.descrizione }}</td>
+          <td>{{ r.categoria }}</td>
+          <td>{{ r.valuta }}</td>
+          <td class="ta-r">{{ r.amount }}</td>
+          <td>{% if r.giorno_id %}<a href="{{ base_url }}/giorno/{{ r.giorno_id }}">Giorno {{ r.giorno_id }}</a>{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if missing_rows|length > 10 %}
+      <div class="note">…e altre {{ missing_rows|length - 10 }} voci.</div>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <div class="cards-3" style="margin-top:.75rem;">
-    <div class="card">
-      <div class="card-title">Totale stimato</div>
-      <div class="card-value">{{ totals.stimato }}</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Totale preventivo</div>
-      <div class="card-value">{{ totals.preventivo }}</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Totale reale</div>
-      <div class="card-value">{{ totals.reale }}</div>
-    </div>
+    <div class="card"><div class="card-title">Totale stimato</div><div class="card-value">{{ totals.stimato }}</div></div>
+    <div class="card"><div class="card-title">Totale preventivo</div><div class="card-value">{{ totals.preventivo }}</div></div>
+    <div class="card"><div class="card-title">Totale reale</div><div class="card-value">{{ totals.reale }}</div></div>
   </div>
 
   <h2 class="sec-title">Per categoria</h2>
@@ -90,9 +106,7 @@
           <td data-raw="{{ cat|lower }}">
             {% if slug %}
               <a href="{{ base_url }}/rendiconto/categoria/{{ slug }}">{{ cat }}</a>
-            {% else %}
-              {{ cat }}
-            {% endif %}
+            {% else %}{{ cat }}{% endif %}
           </td>
           <td class="ta-r" data-raw="{{ by_category_raw[cat]|default(0) }}">{{ val }}</td>
         </tr>
@@ -130,7 +144,6 @@
   </table>
 </section>
 
-{# --- JS: ordinamento client-side --- #}
 <script>
 (function(){
   function sortTable(table, colIndex, type, dir){
