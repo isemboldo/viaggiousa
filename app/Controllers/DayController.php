@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Controllers;
+use App\Security\Csrf;
 
 final class DayController extends BaseController
 {
@@ -135,7 +136,7 @@ $next = $stNext->fetchColumn() ?: null;
             'url'         => $base . '/giorno/' . $dayId,
             'image'       => $day['immagine_copertina'] ?? ($base . '/assets/images/cover-default.jpg'),
         ];
-
+$csrf = Csrf::token();
         $this->view('day.twig', [
             'day'      => $day,
             'sections' => $sections,
@@ -143,6 +144,7 @@ $next = $stNext->fetchColumn() ?: null;
             'next'     => $next ?: null,
             'meta'     => $meta,
             'indice'   => $indice,
+            'csrf'     => $csrf,
         ]);
     }
 

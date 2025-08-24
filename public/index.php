@@ -8,6 +8,7 @@ use App\Controllers\HomeController;
 use App\Controllers\DayController;
 use App\Controllers\SectionController;
 use App\Controllers\HubController;
+use App\Controllers\FeedbackController;
 
 $router = new Router();
 
@@ -17,6 +18,9 @@ $router = new Router();
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/giorno/{id}', [DayController::class, 'show']);
 $router->get('/sezione/{id}', [SectionController::class, 'show']);
+$router->post('/api/section/{id}/feedback', [\App\Controllers\FeedbackController::class, 'react']);
+
+
 
 /**
  * ✅ Hub (unico endpoint “pulito”)

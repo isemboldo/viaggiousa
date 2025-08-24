@@ -64,10 +64,31 @@
       {% endif %}
 
       <div class="counters" aria-label="Feedback sezione" title="Feedback">
-        <span title="Mi piace">👍 {{ s.likes }}</span>
-        <span title="Non mi piace">👎 {{ s.dislikes }}</span>
-        <span title="Richieste info">ℹ️ {{ s.more_info }}</span>
-      </div>
+  <form class="fb-form" action="{{ base_url }}/api/section/{{ s.id }}/feedback" method="post">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="like">
+    <button class="fb-btn" data-action="like" data-section="{{ s.id }}" type="submit" title="Mi piace">
+      👍 <span class="fb-like">{{ s.likes }}</span>
+    </button>
+  </form>
+
+  <form class="fb-form" action="{{ base_url }}/api/section/{{ s.id }}/feedback" method="post">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="dislike">
+    <button class="fb-btn" data-action="dislike" data-section="{{ s.id }}" type="submit" title="Non mi piace">
+      👎 <span class="fb-dislike">{{ s.dislikes }}</span>
+    </button>
+  </form>
+
+  <form class="fb-form" action="{{ base_url }}/api/section/{{ s.id }}/feedback" method="post">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="info">
+    <button class="fb-btn" data-action="info" data-section="{{ s.id }}" type="submit" title="Richiesta info">
+      ℹ️ <span class="fb-info">{{ s.more_info }}</span>
+    </button>
+  </form>
+</div>
+
     </div>
 
     {% if s.testo %}
@@ -190,5 +211,68 @@
   document.querySelectorAll('.day-page .panel-head').forEach(n => ro.observe(n));
 })();
 </script>
+<script>
+(function(){
+  function markGroup(btn){
+    const group = btn.closest('.counters');
+    if (!group) return;
+    const act = btn.dataset.action;
+    // opzionale: mutua esclusione like/dislike lato client
+    if (act === 'like' || act === 'dislike') {
+      group.querySelectorAll('[data-action="like"],[data-action="dislike"]').forEach(b=>{
+        b.classList.add('done');
+        b.setAttribute('disabled','disabled');
+      });
+    }
+    btn.classList.add('done');
+    btn.setAttribute('disabled','disabled');
+  }
+
+  async function ajaxSubmit(form){
+    const btn = form.querySelector('.fb-btn');
+    const formData = new FormData(form);
+    const id = btn.dataset.section;
+    const url = form.getAttribute('action');
+
+    try{
+      const resp = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin', // << invia cookie/sessione
+        headers: {'Accept':'application/json'},
+        body: new URLSearchParams(formData)
+      });
+      const text = await resp.text();
+      let data = {};
+      try { data = JSON.parse(text); } catch(e){ /* non JSON → fallback */ }
+
+      if (!resp.ok || !data.ok) {
+        // Fallback: se AJAX non va, lascia che il form proceda (submit normale)
+        form.submit();
+        return;
+      }
+
+      // Ok: aggiorna contatori e disabilita bottoni
+      const root = form.closest('.counters');
+      if (root){
+        root.querySelector('.fb-like').textContent    = data.counts.likes;
+        root.querySelector('.fb-dislike').textContent = data.counts.dislikes;
+        root.querySelector('.fb-info').textContent    = data.counts.more_info;
+      }
+      markGroup(btn);
+    }catch(e){
+      // Fallback anche su eccezioni
+      form.submit();
+    }
+  }
+
+  document.addEventListener('submit', function(e){
+    const form = e.target.closest('.fb-form');
+    if (!form) return;
+    e.preventDefault();
+    ajaxSubmit(form);
+  }, false);
+})();
+</script>
+
 
 {% endblock %}

@@ -1531,3 +1531,13 @@ body.no-header main.container { padding-top: 0 !important; }
 
 /* Se qualche vecchia regola teneva l'immagine assoluta o con misure fisse, neutralizziamola qui */
 .day-page .panel-media > img{ position: static; width: auto; height: auto; } /* reset difensivo */
+.day-page .counters{ display:inline-flex; gap:10px; align-items:center; }
+.day-page .counters .fb-form{ display:inline-block; margin:0; }
+.day-page .counters .fb-btn{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:.25rem .5rem; border-radius:999px;
+  background: var(--paper-2); border:1px solid var(--edge); cursor:pointer;
+  font-weight:700;
+}
+.day-page .counters .fb-btn.done,
+.day-page .counters .fb-btn[disabled]{ opacity:.55; cursor:default; }

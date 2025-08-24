@@ -10,6 +10,9 @@ final class Router
     public function get(string $pattern, callable|array $handler): void {
         $this->routes['GET'][$this->normalize($pattern)] = $handler;
     }
+public function post(string $pattern, callable|array $handler): void {
+    $this->routes['POST'][$this->normalize($pattern)] = $handler;
+}
 
     public function dispatch(string $method, string $uri): void {
         $path = parse_url($uri, PHP_URL_PATH) ?? '/';
