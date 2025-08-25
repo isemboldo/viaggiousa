@@ -1,0 +1,9 @@
+{% extends "admin/layout.twig" %}
+{% block content %}
+<h1>Dashboard</h1>
+<div class="kpi">
+  <div class="tile"><div class="n">{{ kpi.parti }}</div><div class="l">Parti</div></div>
+  <div class="tile"><div class="n">{{ kpi.giorni }}</div><div class="l">Giorni</div></div>
+  <div class="tile"><div class="n">{{ kpi.sezioni }}</div><div class="l">Sezioni</div></div>
+</div>
+{% endblock %}

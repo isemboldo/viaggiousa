@@ -52,6 +52,15 @@ $router->get('/privacy', function () {
     ]);
 });
 
+// ADMIN
+$router->get('/admin/login', [\App\Controllers\Admin\AuthController::class, 'loginForm']);
+$router->post('/admin/login', [\App\Controllers\Admin\AuthController::class, 'login']);
+$router->get('/admin/logout', [\App\Controllers\Admin\AuthController::class, 'logout']);
+
+$router->get('/admin', [\App\Controllers\Admin\DashboardController::class, 'index']);
+$router->get('/admin/profile', [\App\Controllers\Admin\ProfileController::class, 'form']);
+$router->post('/admin/profile', [\App\Controllers\Admin\ProfileController::class, 'save']);
+
 
 
 /**

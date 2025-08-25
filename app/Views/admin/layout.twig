@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{{ title|default('Admin') }} — Admin</title>
+  <link rel="stylesheet" href="{{ base_url }}/assets/admin.css">
+</head>
+<body class="admin">
+  <aside class="sidebar">
+    <div class="brand"><a href="{{ base_url }}/admin">Viaggio USA · Admin</a></div>
+    <nav>
+      <a href="{{ base_url }}/admin">Dashboard</a>
+      <a href="{{ base_url }}/admin/profile">Profilo</a>
+      <div class="sep"></div>
+      {# In seguito: Itinerario / Contabile / Utilities #}
+      <a href="{{ base_url }}/admin/logout">Logout</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div class="grow"></div>
+      <div class="user">
+        {% if app_env %}<span class="env">{{ app_env }}</span>{% endif %}
+        {% if session.admin is defined %}<span class="email">{{ session.admin.email }}</span>{% endif %}
+      </div>
+    </header>
+
+    <section class="page">
+      {% block content %}{% endblock %}
+    </section>
+  </main>
+</body>
+</html>
