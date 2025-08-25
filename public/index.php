@@ -28,6 +28,15 @@ $router->get('/rendiconto.csv',  [\App\Controllers\RendicontoController::class, 
 $router->get('/rendiconto/categoria/{slug}.csv', [\App\Controllers\RendicontoController::class, 'exportCategoriaCsv']);
 $router->get('/rendiconto/partecipante/{slug}.csv', [\App\Controllers\RendicontoController::class, 'exportPartecipanteCsv']);
 
+// Iscrizioni
+$router->get('/iscrizione', [\App\Controllers\SubscriptionController::class, 'form']);
+$router->post('/iscrizione', [\App\Controllers\SubscriptionController::class, 'subscribe']);
+$router->get('/iscrizione/conferma/{token}', [\App\Controllers\SubscriptionController::class, 'confirm']);
+$router->get('/iscrizione/unsubscribe/{token}', [\App\Controllers\SubscriptionController::class, 'unsubscribe']);
+
+// Notifiche (cron)
+$router->get('/notify/digest', [\App\Controllers\NotifyController::class, 'digest']);
+
 
 
 /**

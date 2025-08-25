@@ -1,0 +1,10 @@
+{% extends "layout.twig" %}
+{% block content %}
+{% if ok %}
+  <h1>Disiscrizione completata</h1>
+  <p>Non riceverai più aggiornamenti. Puoi re-iscriverti in qualunque momento.</p>
+{% else %}
+  <h1>Link non valido</h1>
+  <p>Il collegamento di disiscrizione non è valido o è già stato usato.</p>
+{% endif %}
+{% endblock %}

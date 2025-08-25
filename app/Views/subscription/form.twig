@@ -1,0 +1,14 @@
+{% extends "layout.twig" %}
+{% block content %}
+<h1>Iscrizione aggiornamenti</h1>
+<p>Ricevi una mail quando aggiungiamo o modifichiamo delle pagine del diario.</p>
+
+<form method="post" action="{{ base_url }}/iscrizione" class="stack">
+  <input type="hidden" name="t" value="{{ t }}">
+  <input type="text" name="website" style="display:none" autocomplete="off">
+  <label>Email
+    <input type="email" name="email" required placeholder="tuo@email.ch">
+  </label>
+  <button class="btn">Iscrivimi</button>
+</form>
+{% endblock %}

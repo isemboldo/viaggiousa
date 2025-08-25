@@ -71,4 +71,5 @@
     </div>
   </section>
 <script defer src="{{ base_url }}/assets/hero-fit.js"></script>
+{% include 'subscription/form.twig' with { 't': (date().timestamp) } %}
 {% endblock %}
