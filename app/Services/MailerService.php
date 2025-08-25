@@ -7,8 +7,13 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 final class MailerService
 {
-    public function send(string $toEmail, string $subject, string $html, ?string $textAlt = null): array
-    {
+    public function send(
+    string $toEmail,
+    string $subject,
+    string $html,
+    ?string $textAlt = null,
+    ?string $listUnsubUrl = null
+): array {
         $driver = strtolower((string)($_ENV['MAIL_DRIVER'] ?? 'smtp')); // smtp | file | sendmail
         if ($driver === 'file') {
             return $this->writeToFile($toEmail, $subject, $html, $textAlt);
@@ -67,7 +72,9 @@ final class MailerService
 
             // Header List-Unsubscribe (token sarà sostituito nel template o ignorato dai client)
             $base = rtrim($_ENV['APP_URL_BASE'] ?? '/', '/');
-            $mail->addCustomHeader('List-Unsubscribe', '<' . $base . '/iscrizione/unsubscribe/{token}>');
+            if ($listUnsubUrl) {
+        $mail->addCustomHeader('List-Unsubscribe', '<'.$listUnsubUrl.'>');
+    }
 
             $mail->isHTML(true);
             $mail->Body = $html;

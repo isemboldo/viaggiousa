@@ -93,7 +93,22 @@ final class SubscriptionController extends BaseController
             $mail = $this->mailer()->send($sub['email'], 'Benvenutə – Viaggio USA', $html);
             $this->logger()->log($sub['email'], 'welcome', 'Benvenutə – Viaggio USA', $mail['ok'], $mail['error']);
         }
+$base = $this->absoluteBaseUrl();
+$unsubUrl = $base . '/iscrizione/unsubscribe/' . $sub['token'];
 
+$html = $twig->render('emails/welcome.twig', [
+    'base_url'  => $base,
+    'token'     => $sub['token'],
+    'unsub_url' => $unsubUrl,
+]);
+
+$mail = $this->mailer()->send(
+    $sub['email'],
+    'Benvenutə – Viaggio USA',
+    $html,
+    null,
+    $unsubUrl
+);
         $this->view('subscription/confirmed.twig', [
             'title'=>'Iscrizione confermata',
         ]);

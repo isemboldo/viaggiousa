@@ -46,6 +46,24 @@ final class NotifyController extends BaseController
             }
         }
 
+        $base = $this->absoluteBaseUrl();
+$unsubUrl = $base . '/iscrizione/unsubscribe/' . $row['token'];
+
+$html = \View::env()->render('emails/digest.twig', [
+    'base_url'  => $base,
+    'changes'   => $changes,
+    'unsub_url' => $unsubUrl,
+]);
+
+$res = $mailr->send(
+    $row['email'],
+    'Novità sul Viaggio USA',
+    $html,
+    null,
+    $unsubUrl
+);
+
+
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['sent'=>$sent, 'skipped'=>$skipped], JSON_UNESCAPED_UNICODE);
     }

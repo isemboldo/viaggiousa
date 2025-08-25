@@ -1,17 +1,13 @@
 <!doctype html>
 <html>
   <body style="font-family:system-ui,Segoe UI,Roboto,sans-serif;line-height:1.4">
-    <h2>Novità sul Viaggio USA</h2>
-    <p>Ecco cosa è cambiato dall’ultimo aggiornamento:</p>
-    <ul>
-    {% for c in changes %}
-      <li>
-        <strong>{{ c.parte_titolo }}</strong> —
-        <a href="{{ base_url }}/giorno/{{ c.giorno_id }}">{{ c.giorno_titolo }}</a>
-        <small>(aggiornato {{ c.data_modifica }})</small>
-      </li>
-    {% endfor %}
-    </ul>
-    <p><a href="{{ base_url }}">Apri il diario</a></p>
+    <h2>Benvenutə!</h2>
+    <p>Da ora riceverai un riepilogo quando pubblichiamo novità.</p>
+    <p><a href="{{ base_url }}">Visita il diario</a></p>
+    <hr>
+    <p style="font-size:13px;color:#666">
+      Non vuoi più ricevere aggiornamenti?
+      <a href="{{ unsub_url }}">Disiscriviti</a>
+    </p>
   </body>
 </html>
