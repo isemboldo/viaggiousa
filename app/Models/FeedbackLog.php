@@ -42,4 +42,32 @@ final class FeedbackLog
         $st->execute();
         return (bool)$st->fetchColumn();
     }
+    public function hasOppositeAction(
+    int $sezioneId,
+    string $action,            // 'like' | 'dislike' | 'more'
+    string $ipHash,
+    string $uaHash,
+    string $cookieToken
+): bool {
+    if ($action === 'more') return false; // 'more' non ha opposto
+    $opp = ($action === 'like') ? 'dislike' : 'like';
+
+    $st = $this->db->prepare("
+        SELECT 1
+        FROM feedback_log
+        WHERE sezione_id = :sid
+          AND action = :opp
+          AND (cookie_token = :ck OR ip_hash = :ip OR ua_hash = :ua)
+        LIMIT 1
+    ");
+    $st->execute([
+        ':sid' => $sezioneId,
+        ':opp' => $opp,
+        ':ck'  => $cookieToken,
+        ':ip'  => $ipHash,
+        ':ua'  => $uaHash,
+    ]);
+    return (bool)$st->fetchColumn();
+}
+
 }

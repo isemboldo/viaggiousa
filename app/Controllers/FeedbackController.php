@@ -58,6 +58,23 @@ final class FeedbackController extends BaseController
         $fb  = new Feedback($pdo);
         $log = new FeedbackLog($pdo);
 
+        // Blocco giudizio opposto (like vs dislike) sulla stessa sezione
+if (in_array($action, ['like','dislike'], true)
+    && $log->hasOppositeAction($sezioneId, $action, $ipHash, $uaHash, $cookie)) {
+
+    $counts = $fb->counts($sezioneId);
+    $msg = 'Hai già espresso un giudizio per questa sezione.';
+    echo json_encode([
+        'status'  => 'ok',
+        'message' => $msg,
+        'counts'  => $counts,
+        'already' => true,
+        'blocked' => 'opposite'
+    ]);
+    return;
+}
+
+
         // Rate-limit server: una reazione (stessa azione) per sezione ogni 24h per attore
         if ($log->recentlyExists($sezioneId, $action, $ipHash, $uaHash, $cookie, $this->windowSec)) {
             // niente errore: UX-friendly (già registrato)
