@@ -91,4 +91,11 @@ final class Subscription
         $st = $this->db->prepare("UPDATE iscrizioni SET last_digest_at=:now WHERE email=:e");
         $st->execute([':now'=>$now, ':e'=>$email]);
     }
+    public function deleteByToken(string $token): bool
+{
+    $st = $this->db->prepare("DELETE FROM iscrizioni WHERE token=:t");
+    $st->execute([':t'=>$token]);
+    return $st->rowCount() > 0;
+}
+
 }

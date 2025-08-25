@@ -140,4 +140,13 @@ $mail = $this->mailer()->send(
             'message'=>$msg,
         ]);
     }
+    public function delete(string $token): void
+{
+    $ok = (new \App\Models\Subscription(\DB::pdo()))->deleteByToken($token);
+    $this->view('subscription/unsubscribed.twig', [
+        'title' => $ok ? 'Dati cancellati' : 'Link non valido',
+        'ok'    => $ok,
+    ]);
+}
+
 }

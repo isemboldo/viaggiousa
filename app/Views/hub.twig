@@ -85,6 +85,5 @@
 
 <!-- JS del carosello (cross-fade, autoplay, a11y) -->
 <script defer src="{{ base_url }}/assets/hub-carousel.js"></script>
-{% include 'subscription/form.twig' with { 't': (date().timestamp) } %}
-
+{% include 'partials/subscribe-inline.twig' with { 't': (date().timestamp) } %}
 {% endblock %}

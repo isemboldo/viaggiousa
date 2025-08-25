@@ -33,9 +33,24 @@ $router->get('/iscrizione', [\App\Controllers\SubscriptionController::class, 'fo
 $router->post('/iscrizione', [\App\Controllers\SubscriptionController::class, 'subscribe']);
 $router->get('/iscrizione/conferma/{token}', [\App\Controllers\SubscriptionController::class, 'confirm']);
 $router->get('/iscrizione/unsubscribe/{token}', [\App\Controllers\SubscriptionController::class, 'unsubscribe']);
+$router->get('/iscrizione/delete/{token}', [\App\Controllers\SubscriptionController::class, 'delete']);
+
 
 // Notifiche (cron)
 $router->get('/notify/digest', [\App\Controllers\NotifyController::class, 'digest']);
+$router->get('/maintenance/cleanup', [\App\Controllers\MaintenanceController::class, 'cleanup']);
+
+$router->get('/privacy', function () {
+    \View::env()->display('privacy.twig', [
+        'title' => 'Privacy',
+        'privacy_contact_email' => $_ENV['PRIVACY_CONTACT_EMAIL'] ?? 'info@example.com',
+        'meta' => [
+            'title' => 'Privacy – Viaggio USA',
+            'description' => 'Informativa sul trattamento dati.',
+            'url' => ($_ENV['APP_URL_PUBLIC'] ?? '') . '/privacy'
+        ]
+    ]);
+});
 
 
 

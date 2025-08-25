@@ -17,16 +17,32 @@ final class FeedbackController extends BaseController
     }
 
     private function clientToken(): string
-    {
-        // cookie persistente lato client
-        $name = 'fb_token';
-        if (empty($_COOKIE[$name])) {
-            $tok = bin2hex(random_bytes(16));
-            setcookie($name, $tok, time()+60*60*24*365, '/', '', false, true);
-            $_COOKIE[$name] = $tok;
-        }
-        return (string)$_COOKIE[$name];
+{
+    $name = 'fb_token';
+    if (empty($_COOKIE[$name])) {
+        $tok = bin2hex(random_bytes(16));
+
+        // Base path del sito (evita che il cookie esca dal path /viaggiousa)
+        $path = $_ENV['APP_URL_BASE'] ?? '/';
+        if ($path === '' || $path[0] !== '/') $path = '/';
+
+        // Se c'è HTTPS, imposta secure=true
+        $isHttps = (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+
+        @setcookie($name, $tok, [
+            'expires'  => time() + 60*60*24*365, // 1 anno
+            'path'     => $path,
+            'domain'   => $_ENV['COOKIE_DOMAIN'] ?? '',
+            'secure'   => $isHttps,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+        $_COOKIE[$name] = $tok;
     }
+    return (string)$_COOKIE[$name];
+}
+
 
     private function hashValue(string $value): string
     {

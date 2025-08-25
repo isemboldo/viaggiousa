@@ -13,3 +13,16 @@
 <FilesMatch "\.(env|lock|sql|yml|yaml|xml|dist)$">
   Require all denied
 </FilesMatch>
+
+# --- Security headers (base sicuro senza rompere inline CSS/JS) ---
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=()"
+  # Se sei su HTTPS in prod, abilita HSTS (dopo verifica): 
+  # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # CSP in report-only (non blocca nulla). Quando avrai rimosso gli inline, passeremo a "set" senza Report-Only
+  Header always set Content-Security-Policy-Report-Only "default-src 'self' data:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';"
+</IfModule>

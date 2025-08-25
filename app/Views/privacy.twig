@@ -1,0 +1,26 @@
+{% extends "layout.twig" %}
+{% block title %}Privacy{% endblock %}
+
+{% block content %}
+<article class="prose">
+  <h1>Privacy</h1>
+  <p>Questo sito raccoglie il minimo indispensabile per funzionare e per permetterti di seguirci.</p>
+
+  <h2>Iscrizioni e-mail</h2>
+  <ul>
+    <li>Conserviamo la tua e-mail per inviarti aggiornamenti sul diario.</li>
+    <li>Puoi disiscriverti in ogni momento dal link presente in fondo ad ogni e-mail.</li>
+    <li>Gli invii sono registrati in un log tecnico (oggetto, esito, orario) e vengono cancellati periodicamente.</li>
+  </ul>
+
+  <h2>Feedback “mi piace / non mi piace / info”</h2>
+  <ul>
+    <li>Salviamo solo contatori aggregati per ciascuna sezione.</li>
+    <li>Per prevenire abusi usiamo un cookie tecnico e hash di IP/User-Agent: non memorizziamo il tuo IP in chiaro.</li>
+    <li>I dati tecnici del log vengono cancellati periodicamente.</li>
+  </ul>
+
+  <h2>Contatti</h2>
+  <p>Per qualsiasi richiesta: <a href="mailto:{{ privacy_contact_email }}">{{ privacy_contact_email }}</a></p>
+</article>
+{% endblock %}
