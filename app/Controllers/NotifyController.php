@@ -25,7 +25,7 @@ final class NotifyController extends BaseController
         $log   = new EmailLog($pdo);
         $mailr = new MailerService();
 
-        $base = rtrim($_ENV['APP_URL_BASE'] ?? '', '/');
+        $base = $this->absoluteBaseUrl();
 
         $sent = 0; $skipped = 0;
         foreach ($subs->allConfirmed() as $row) {

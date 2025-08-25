@@ -61,7 +61,7 @@ final class SubscriptionController extends BaseController
         $token = $sub['token'];
 
         $twig = \View::env();
-        $base = rtrim($_ENV['APP_URL_BASE'] ?? '', '/');
+        $base = $this->absoluteBaseUrl();
         $confirmUrl = $base . '/iscrizione/conferma/' . $token;
 
         $html = $twig->render('emails/confirm.twig', [
@@ -88,7 +88,7 @@ final class SubscriptionController extends BaseController
         $sub = $this->repo()->byToken($token);
         if ($sub && !empty($sub['email'])) {
             $twig = \View::env();
-            $base = rtrim($_ENV['APP_URL_BASE'] ?? '', '/');
+            $base = $this->absoluteBaseUrl();
             $html = $twig->render('emails/welcome.twig', ['base_url'=>$base]);
             $mail = $this->mailer()->send($sub['email'], 'Benvenutə – Viaggio USA', $html);
             $this->logger()->log($sub['email'], 'welcome', 'Benvenutə – Viaggio USA', $mail['ok'], $mail['error']);
