@@ -11,7 +11,6 @@
   <div class="day-hero-veil"></div>
 </div>
 
-
   <div class="container">
     {# Meta + Heading #}
     <header class="day-head">
@@ -43,60 +42,59 @@
       <section class="story">
         {% for s in sections %}
           <article class="panel{% if loop.index is odd %} alt{% endif %}">
-  <div class="panel-media">
-  <div class="media-frame">
-    {% if s.immagine %}
-      <img src="{{ asset_url(s.immagine) }}" alt="" loading="lazy" decoding="async">
-    {% endif %}
-  </div>
-</div>
+            <div class="panel-media">
+              <div class="media-frame">
+                {% if s.immagine %}
+                  <img src="{{ asset_url(s.immagine) }}" alt="" loading="lazy" decoding="async">
+                {% endif %}
+              </div>
+            </div>
 
+            <div class="panel-body">
+              <div class="panel-head">
+                {# Occhiello sopra al titolo #}
+                {% if s.sovratitolo %}
+                  <div class="eyebrow">{{ s.sovratitolo }}</div>
+                {% endif %}
 
-  <div class="panel-body">
-    <div class="panel-head">
-      {# Occhiello sopra al titolo #}
-      {% if s.sovratitolo %}
-        <div class="eyebrow">{{ s.sovratitolo }}</div>
-      {% endif %}
+                {% if s.titolo %}
+                  <h3 class="h3">{{ s.titolo }}</h3>
+                {% endif %}
 
-      {% if s.titolo %}
-        <h3 class="h3">{{ s.titolo }}</h3>
-      {% endif %}
+                {# FEEDBACK (3 pulsanti) — compatibile con controller hardening #}
+                <div class="counters" aria-label="Feedback sezione" title="Feedback">
+                  <form class="fb-form" action="{{ base_url }}/api/section/{{ s.id }}/feedback" method="post">
+                    <input type="hidden" name="csrf" value="{{ csrf }}">
+                    <input type="hidden" name="action" value="like">
+                    <button class="fb-btn" data-action="like" data-section="{{ s.id }}" type="submit" title="Mi piace">
+                      👍 <span class="fb-like">{{ s.likes }}</span>
+                    </button>
+                  </form>
 
-      <div class="counters" aria-label="Feedback sezione" title="Feedback">
-  <form class="fb-form" action="{{ base_url }}/api/section/{{ s.id }}/feedback" method="post">
-    <input type="hidden" name="csrf" value="{{ csrf }}">
-    <input type="hidden" name="action" value="like">
-    <button class="fb-btn" data-action="like" data-section="{{ s.id }}" type="submit" title="Mi piace">
-      👍 <span class="fb-like">{{ s.likes }}</span>
-    </button>
-  </form>
+                  <form class="fb-form" action="{{ base_url }}/api/section/{{ s.id }}/feedback" method="post">
+                    <input type="hidden" name="csrf" value="{{ csrf }}">
+                    <input type="hidden" name="action" value="dislike">
+                    <button class="fb-btn" data-action="dislike" data-section="{{ s.id }}" type="submit" title="Non mi piace">
+                      👎 <span class="fb-dislike">{{ s.dislikes }}</span>
+                    </button>
+                  </form>
 
-  <form class="fb-form" action="{{ base_url }}/api/section/{{ s.id }}/feedback" method="post">
-    <input type="hidden" name="csrf" value="{{ csrf }}">
-    <input type="hidden" name="action" value="dislike">
-    <button class="fb-btn" data-action="dislike" data-section="{{ s.id }}" type="submit" title="Non mi piace">
-      👎 <span class="fb-dislike">{{ s.dislikes }}</span>
-    </button>
-  </form>
+                  <form class="fb-form" action="{{ base_url }}/api/section/{{ s.id }}/feedback" method="post">
+                    <input type="hidden" name="csrf" value="{{ csrf }}">
+                    {# FIX: 'info' -> 'more' #}
+                    <input type="hidden" name="action" value="more">
+                    <button class="fb-btn" data-action="more" data-section="{{ s.id }}" type="submit" title="Richiesta info">
+                      ℹ️ <span class="fb-info">{{ s.more_info }}</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
 
-  <form class="fb-form" action="{{ base_url }}/api/section/{{ s.id }}/feedback" method="post">
-    <input type="hidden" name="csrf" value="{{ csrf }}">
-    <input type="hidden" name="action" value="info">
-    <button class="fb-btn" data-action="info" data-section="{{ s.id }}" type="submit" title="Richiesta info">
-      ℹ️ <span class="fb-info">{{ s.more_info }}</span>
-    </button>
-  </form>
-</div>
-
-    </div>
-
-    {% if s.testo %}
-      <div class="richtext">{{ s.testo|raw }}</div>
-    {% endif %}
-  </div>
-</article>
-
+              {% if s.testo %}
+                <div class="richtext">{{ s.testo|raw }}</div>
+              {% endif %}
+            </div>
+          </article>
         {% endfor %}
       </section>
     {% endif %}
@@ -142,7 +140,7 @@
 
 </section>
 
-{# === JS MINIMO per il modal indice (accessibile) ========================== #}
+{# === JS: indice accessibile =========================================== #}
 <script>
 (function(){
   var openBtn  = document.querySelector('[data-open-index]');
@@ -153,7 +151,6 @@
 
   function open(){
     modal.classList.remove('hidden');
-    // metti il focus nel panel per tastiera
     panel.focus();
     document.addEventListener('keydown', onKey);
   }
@@ -162,9 +159,7 @@
     document.removeEventListener('keydown', onKey);
     openBtn && openBtn.focus();
   }
-  function onKey(e){
-    if (e.key === 'Escape') close();
-  }
+  function onKey(e){ if (e.key === 'Escape') close(); }
 
   openBtn.addEventListener('click', open);
   (closeBtn || modal).addEventListener('click', function(e){
@@ -172,22 +167,20 @@
   });
 })();
 </script>
+
+{# === JS: fit titolo sezione su una riga (come avevi) =================== #}
 <script>
 (function(){
   function fitOne(el, minPx, maxPx){
-    // titolo su una sola riga: calcola spazio disponibile nella colonna 1
-    const head = el.closest('.panel-head');
-    if (!head) return;
+    const head = el.closest('.panel-head'); if (!head) return;
     const counters = head.querySelector('.counters');
     const gap = parseFloat(getComputedStyle(head).columnGap) || 0;
     const available = head.clientWidth - (counters ? (counters.offsetWidth + gap) : 0);
 
     let lo = minPx, hi = maxPx, best = minPx;
-    // prova dimensioni con ricerca binaria
     while (lo <= hi) {
       const mid = Math.floor((lo + hi) / 2);
       el.style.fontSize = mid + 'px';
-      // se la larghezza del testo entra nello spazio disponibile, prova più grande
       if (el.scrollWidth <= available) { best = mid; lo = mid + 1; }
       else { hi = mid - 1; }
     }
@@ -201,19 +194,16 @@
     document.querySelectorAll('.day-page .panel-head .h3').forEach(el => fitOne(el, minPx, maxPx));
   }
 
-  // prima passata quando i font sono caricati
   window.addEventListener('load', run);
-  // ricalcola al resize (throttled)
   let t; window.addEventListener('resize', ()=>{ clearTimeout(t); t=setTimeout(run, 80); });
-
-  // se dinamicamente cambiano i pannelli, osserva
   const ro = new ResizeObserver(()=> run());
   document.querySelectorAll('.day-page .panel-head').forEach(n => ro.observe(n));
 })();
 </script>
+
+{# === JS: feedback AJAX (compat con controller hardening) =============== #}
 <script>
 (function(){
-  // --- mini toast non-invasivo ---
   function toast(msg){
     let c = document.getElementById('vu-toast');
     if(!c){
@@ -236,7 +226,6 @@
   function markGroup(btn){
     const group = btn.closest('.counters');
     if (!group) return;
-    // opzionale: mutua esclusione like/dislike lato client
     if (btn.dataset.action === 'like' || btn.dataset.action === 'dislike') {
       group.querySelectorAll('[data-action="like"],[data-action="dislike"]').forEach(b=>{
         b.classList.add('done');
@@ -250,23 +239,22 @@
   async function ajaxSubmit(form){
     const btn = form.querySelector('.fb-btn');
     if(!btn) return;
-    const formData = new FormData(form);
+    const formData = new URLSearchParams(new FormData(form));
     const url = form.getAttribute('action');
 
     try{
       const resp = await fetch(url, {
         method: 'POST',
-        credentials: 'same-origin',           // invia cookie/sessione
-        headers: {'Accept':'application/json'},
-        body: new URLSearchParams(formData)
+        credentials: 'same-origin',
+        headers: {'Accept':'application/json','Content-Type':'application/x-www-form-urlencoded'},
+        body: formData.toString()
       });
 
-      // Proviamo a leggere JSON; se non è JSON, trattiamo come errore “soft”
       let data = null;
       try { data = await resp.json(); } catch { data = null; }
 
-      if (resp.ok && data && data.ok){
-        // successo: aggiorna contatori e disabilita
+      // SUCCESS: compat sia con {ok:true} sia con {status:"ok"}
+      if (resp.ok && data && (data.ok === true || data.status === 'ok')) {
         const root = form.closest('.counters');
         if (root && data.counts){
           const L = root.querySelector('.fb-like');
@@ -277,30 +265,29 @@
           if (I) I.textContent = data.counts.more_info;
         }
         markGroup(btn);
-        toast('Grazie per il feedback!');
+        toast(data.message || 'Grazie per il feedback!');
         return;
       }
 
-      // Gestione “user friendly” degli errori comuni
-      if (resp.status === 409){         // Already recorded
-        markGroup(btn);                 // disabilita come se fosse già cliccato
-        toast('Hai già registrato il tuo feedback per questa sezione.');
+      // ALREADY: compat con {already:true} o HTTP 409
+      if ((data && data.already === true) || resp.status === 409){
+        markGroup(btn);
+        toast(data && data.message ? data.message : 'Hai già registrato il tuo feedback.');
         return;
       }
-      if (resp.status === 419){         // CSRF / sessione
+
+      // CSRF / sessione (se mai usato lato server)
+      if (resp.status === 419){
         toast('Sessione scaduta. Ricarica la pagina e riprova.');
         return;
       }
 
-      // altri errori: non aprire il JSON, avvisa soltanto
       toast('Ops, errore temporaneo. Riprova più tardi.');
     }catch(e){
-      // errore di rete: non aprire JSON
       toast('Connessione assente: riprova.');
     }
   }
 
-  // Intercetta il submit dei tre form e impedisce navigazione
   document.addEventListener('submit', function(e){
     const form = e.target.closest('.fb-form');
     if (!form) return;

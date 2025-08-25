@@ -9,48 +9,34 @@ final class Feedback
 {
     public function __construct(private PDO $db) {}
 
-    public function increment(int $sectionId, string $action): array
+    public function ensureRow(int $sezioneId): void
     {
-        $colLikes = ($action === 'like')    ? 1 : 0;
-        $colDis   = ($action === 'dislike') ? 1 : 0;
-        $colInfo  = ($action === 'info')    ? 1 : 0;
-
-        // Compatibile con MySQL/MariaDB senza usare VALUES()
-        $sql = "
-            INSERT INTO feedback_sezioni (sezione_id, likes, dislikes, more_info)
-            VALUES (:id, :ins_likes, :ins_dislikes, :ins_info)
-            ON DUPLICATE KEY UPDATE
-                likes     = likes     + :upd_likes,
-                dislikes  = dislikes  + :upd_dislikes,
-                more_info = more_info + :upd_info
-        ";
-        $st = $this->db->prepare($sql);
-        $st->execute([
-            ':id'           => $sectionId,
-            ':ins_likes'    => $colLikes,
-            ':ins_dislikes' => $colDis,
-            ':ins_info'     => $colInfo,
-            ':upd_likes'    => $colLikes,
-            ':upd_dislikes' => $colDis,
-            ':upd_info'     => $colInfo,
-        ]);
-
-        return $this->getCounts($sectionId);
+        $st = $this->db->prepare("INSERT IGNORE INTO feedback_sezioni (sezione_id, likes, dislikes, more_info) VALUES (:id,0,0,0)");
+        $st->execute([':id'=>$sezioneId]);
     }
 
-    public function getCounts(int $sectionId): array
+    public function increment(int $sezioneId, string $action): void
     {
-        $st = $this->db->prepare("
-            SELECT likes, dislikes, more_info
-            FROM feedback_sezioni
-            WHERE sezione_id = :id
-        ");
-        $st->execute([':id' => $sectionId]);
-        $row = $st->fetch(PDO::FETCH_ASSOC) ?: ['likes'=>0,'dislikes'=>0,'more_info'=>0];
-        return [
-            'likes'     => (int)$row['likes'],
-            'dislikes'  => (int)$row['dislikes'],
-            'more_info' => (int)$row['more_info'],
-        ];
+        $this->ensureRow($sezioneId);
+
+        $col = match ($action) {
+            'like'    => 'likes',
+            'dislike' => 'dislikes',
+            'more'    => 'more_info',
+            default   => null
+        };
+        if (!$col) throw new \InvalidArgumentException('Invalid action');
+
+        $sql = "UPDATE feedback_sezioni SET {$col} = {$col} + 1 WHERE sezione_id = :id";
+        $st  = $this->db->prepare($sql);
+        $st->execute([':id'=>$sezioneId]);
+    }
+
+    public function counts(int $sezioneId): array
+    {
+        $st = $this->db->prepare("SELECT likes, dislikes, more_info FROM feedback_sezioni WHERE sezione_id=:id");
+        $st->execute([':id'=>$sezioneId]);
+        $r = $st->fetch(PDO::FETCH_ASSOC);
+        return $r ?: ['likes'=>0,'dislikes'=>0,'more_info'=>0];
     }
 }

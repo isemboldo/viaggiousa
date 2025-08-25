@@ -4,83 +4,73 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Models\Feedback;
-use App\Security\Csrf;
-use PDO;
+use App\Models\FeedbackLog;
 
 final class FeedbackController extends BaseController
 {
-    private function appKey(): string {
-        return $_ENV['APP_KEY'] ?? $_ENV['APP_SECRET'] ?? 'temp-key-change-me';
+    /** finestra rate-limit (secondi): 86400 = 24h */
+    private int $windowSec = 86400;
+
+    private function salt(): string
+    {
+        return $_ENV['FEEDBACK_SALT'] ?? ($_ENV['APP_KEY'] ?? 'salt');
     }
 
-    private function readCookie(int $sectionId): array {
-        $cookie = $_COOKIE['vu_fb'] ?? '';
-        if (!$cookie) return [];
-        $parts = explode('.', $cookie, 2);
-        if (count($parts) !== 2) return [];
-        [$payload, $sig] = $parts;
-        $calc = hash_hmac('sha256', $payload, $this->appKey());
-        if (!hash_equals($calc, $sig)) return [];
-        $data = json_decode(base64_decode($payload) ?: '[]', true);
-        return is_array($data) ? $data : [];
+    private function clientToken(): string
+    {
+        // cookie persistente lato client
+        $name = 'fb_token';
+        if (empty($_COOKIE[$name])) {
+            $tok = bin2hex(random_bytes(16));
+            setcookie($name, $tok, time()+60*60*24*365, '/', '', false, true);
+            $_COOKIE[$name] = $tok;
+        }
+        return (string)$_COOKIE[$name];
     }
 
-    private function writeCookie(array $data): void {
-        $payload = base64_encode(json_encode($data, JSON_UNESCAPED_SLASHES));
-        $sig = hash_hmac('sha256', $payload, $this->appKey());
-        setcookie('vu_fb', $payload . '.' . $sig, [
-            'expires'  => time() + 3600*24*365,
-            'path'     => $_ENV['APP_URL_BASE'] ?? '/',
-            'samesite' => 'Lax',
-            'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
-            'httponly' => false,
-        ]);
+    private function hashValue(string $value): string
+    {
+        return hash('sha256', $value . '|' . $this->salt());
     }
 
+    /** POST /api/section/{id}/feedback  body: action=like|dislike|more */
     public function react(string $id): void
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        // accetta SOLO POST
-        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
-            http_response_code(405);
-            echo json_encode(['error' => 'Method Not Allowed']); return;
+        $sezioneId = (int)$id;
+        $action = strtolower(trim((string)($_POST['action'] ?? '')));
+        if (!in_array($action, ['like','dislike','more'], true)) {
+            http_response_code(400);
+            echo json_encode(['status'=>'error','message'=>'Azione non valida']); return;
         }
 
-        $sectionId = (int)$id;
-        $action = $_POST['action'] ?? '';
-        $csrf   = $_POST['csrf']   ?? '';
+        // Identità "soft" dell'utente
+        $cookie = $this->clientToken();
+        $ip     = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $ua     = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-        if ($sectionId <= 0 || !in_array($action, ['like','dislike','info'], true)) {
-            http_response_code(422);
-            echo json_encode(['error'=>'Bad request']); return;
-        }
+        // Hash privacy-preserving
+        $ipHash = $this->hashValue($ip);
+        $uaHash = $this->hashValue($ua);
 
-        // CSRF: obbligatorio in prod; in locale tolleriamo per test
-        $isLocal = (($_ENV['APP_ENV'] ?? '') === 'local');
-        if (!Csrf::check($csrf) && !$isLocal) {
-            http_response_code(419);
-            echo json_encode(['error'=>'CSRF token invalid']); return;
-        }
-
-        // anti-doppio click per utente/dispositivo
-        $cookie = $this->readCookie($sectionId);
-        $key = "s{$sectionId}";
-        $done = $cookie[$key] ?? ['like'=>false,'dislike'=>false,'info'=>false];
-        if (!empty($done[$action])) {
-            http_response_code(409);
-            echo json_encode(['error'=>'Already recorded']); return;
-        }
-
-        // <<< QUI LA FIX: prendiamo la PDO dal singleton DB::pdo() >>>
         $pdo = \DB::pdo();
-        $model  = new Feedback($pdo);
-        $counts = $model->increment($sectionId, $action);
+        $fb  = new Feedback($pdo);
+        $log = new FeedbackLog($pdo);
 
-        $done[$action] = true;
-        $cookie[$key] = $done;
-        $this->writeCookie($cookie);
+        // Rate-limit server: una reazione (stessa azione) per sezione ogni 24h per attore
+        if ($log->recentlyExists($sezioneId, $action, $ipHash, $uaHash, $cookie, $this->windowSec)) {
+            // niente errore: UX-friendly (già registrato)
+            $counts = $fb->counts($sezioneId);
+            echo json_encode(['status'=>'ok','message'=>'Già registrato','counts'=>$counts, 'already'=>true]);
+            return;
+        }
 
-        echo json_encode(['ok'=>true, 'counts'=>$counts, 'done'=>$done]);
+        // Incremento contatore + log
+        $fb->increment($sezioneId, $action);
+        $log->insert($sezioneId, $action, $ipHash, $uaHash, $cookie);
+
+        $counts = $fb->counts($sezioneId);
+        echo json_encode(['status'=>'ok','message'=>'Grazie!','counts'=>$counts, 'already'=>false]);
     }
 }

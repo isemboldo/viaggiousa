@@ -48,6 +48,16 @@ $fbCookie = $this->readFeedbackCookie(); // array tipo [ "s12" => ["like"=>true,
         ");
         $stS->execute([':id' => $dayId]);
         $sections = $stS->fetchAll(\PDO::FETCH_ASSOC);
+        $pdo = \DB::pdo();
+$fb  = new \App\Models\Feedback($pdo);
+
+foreach ($sections as &$s) {
+    $s['feedback'] = $fb->counts((int)$s['id']);  // ['likes'=>..,'dislikes'=>..,'more_info'=>..]
+}
+unset($s);
+
+// passa $sections alla view come già fai ora
+
 
         // Prev/Next su TUTTI i giorni (continuità globale)
 $stPrev = $db->prepare("
